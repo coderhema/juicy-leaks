@@ -1,12 +1,12 @@
-# GuardRail Lens web UI
+# Juicy Leaks web UI
 
 React 19 + TypeScript + Vite, built with Meta's [Astryx](https://astryx.atmeta.com) design system
-(`@astryxdesign/core`, neutral theme with the GuardRail navy/cyan accent). It talks to the FastAPI
-wrapper in `guardrail_lens/api.py`.
+(`@astryxdesign/core`, neutral theme with the Juicy Leaks navy/cyan accent). It talks to the FastAPI
+wrapper in `juicy_leaks/api.py`.
 
 ```bash
 # from the repo root
-uvicorn guardrail_lens.api:app --port 8000     # API (and serves web/dist once built)
+uvicorn juicy_leaks.api:app --port 8000     # API (and serves web/dist once built)
 cd web && npm ci && npm run dev                # dev server on :5173, proxies /api to :8000
 npm run build                                  # production build into web/dist
 ```

@@ -1,6 +1,6 @@
 """Thin FastAPI wrapper around the scanner, used by the Astryx web UI in /web.
 
-Run:  uvicorn guardrail_lens.api:app --port 8000     (serves web/dist at / when it has been built)
+Run:  uvicorn juicy_leaks.api:app --port 8000     (serves web/dist at / when it has been built)
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 STAGES = ["target", "attacks", "replies", "judge", "score", "patch", "rescan"]
 
-app = FastAPI(title="GuardRail Lens API", version="0.2.0")
+app = FastAPI(title="Juicy Leaks API", version="0.2.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                    allow_methods=["*"], allow_headers=["*"])
 JOBS: dict[str, dict] = {}

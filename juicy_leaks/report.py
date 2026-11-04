@@ -19,7 +19,7 @@ def _grade(s: int | None) -> str:
 def to_markdown(report: dict) -> str:
     b = report["before"]["score"]
     a = report.get("after", {}).get("score")
-    out = [f"# GuardRail Lens report: {report['target']['name']}", "",
+    out = [f"# Juicy Leaks report: {report['target']['name']}", "",
            f"_Generated {report['generated_at']} | mode: {report['mode']} | target model: {report['target']['model']}_", ""]
     if a:
         out += [f"**Safety score: {b['overall']}/100 ({_grade(b['overall'])}) -> {a['overall']}/100 ({_grade(a['overall'])}) after patch**", ""]

@@ -43,7 +43,7 @@ export default function App() {
   const poll = useRef<number | undefined>(undefined)
 
   useEffect(() => {
-    getExamples().then(setExamples).catch(e => setError(`Can't reach the GuardRail Lens server: ${e.message}`))
+    getExamples().then(setExamples).catch(e => setError(`Can't reach the Juicy Leaks server: ${e.message}`))
     getConfig().then(c => { setConfig(c); setProvider(c.default_provider) }).catch(() => {})
     return () => window.clearInterval(poll.current)
   }, [])
@@ -85,7 +85,7 @@ export default function App() {
     const one = Array.isArray(f) ? f[0] : f
     setFile(one ?? null)
     if (!one) return
-    try { showReport(JSON.parse(await one.text())); setError(null) } catch { setError('That file is not a GuardRail Lens report.') }
+    try { showReport(JSON.parse(await one.text())); setError(null) } catch { setError('That file is not a Juicy Leaks report.') }
   }
 
   const selected = examples.find(e => e.id === exampleId)
@@ -93,7 +93,7 @@ export default function App() {
   return (
     <VStack maxWidth={980} width="100%" paddingInline={6} paddingBlock={8} gap={8} style={{ marginInline: 'auto' }}>
       <VStack gap={2}>
-        <img src="/logo.png" alt="GuardRail Lens" style={{ height: 64, width: "auto", alignSelf: "flex-start" }} />
+        <img src="/wordmark.png" alt="Juicy Leaks" style={{ height: 88, width: "auto", alignSelf: "flex-start" }} />
         <Text type="large" color="secondary">Red-team your chatbots, MCP servers and endpoints before attackers do.</Text>
       </VStack>
 
@@ -149,6 +149,7 @@ export default function App() {
 
       {!report && !running && (
         <EmptyState title="No scan yet" headingLevel={3}
+          icon={<img src="/mascot.png" alt="" style={{ height: 180, width: "auto" }} />}
           description="Not sure where to start? Run the demo: we attack a fake bank chatbot and show you what leaked and how to fix it. Takes a few seconds, no API key."
           actions={<Button label="Try the demo" variant="primary" onClick={() => run({ example: 'bank_bot', kind: 'chatbot' })} />} />
       )}

@@ -1,11 +1,11 @@
 import threading
 from pathlib import Path
 
-from guardrail_lens.config import Settings
-from guardrail_lens.mcp_scan import danger_of, sample_args, scan_mcp, scan_output, static_checks
-from guardrail_lens.report import to_markdown
-from guardrail_lens.scanner import scan
-from guardrail_lens.targets import Target
+from juicy_leaks.config import Settings
+from juicy_leaks.mcp_scan import danger_of, sample_args, scan_mcp, scan_output, static_checks
+from juicy_leaks.report import to_markdown
+from juicy_leaks.scanner import scan
+from juicy_leaks.targets import Target
 
 EX = Path(__file__).resolve().parent.parent / "examples"
 

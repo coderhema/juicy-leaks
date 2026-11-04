@@ -7,9 +7,9 @@ import { defineTheme } from '@astryxdesign/core/theme'
 import { themes, defaultThemeSlug } from './astryx-themes'
 import App from './App'
 
-// Neutral Astryx theme, with the GuardRail Lens navy + cyan brand on top.
-const guardrail = defineTheme({
-  name: 'guardrail',
+// Neutral Astryx theme, with the Juicy Leaks navy + cyan brand on top.
+const brand = defineTheme({
+  name: 'juicy-leaks',
   extends: themes[defaultThemeSlug],
   tokens: {
     '--color-accent': ['#0e7490', '#22c3ee'],
@@ -19,7 +19,7 @@ const guardrail = defineTheme({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Theme theme={guardrail} mode="light">
+    <Theme theme={brand} mode="light">
       <App />
     </Theme>
   </StrictMode>,

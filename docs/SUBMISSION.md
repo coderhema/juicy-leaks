@@ -2,33 +2,33 @@
 
 > Draft answers. Edit them into your own words before submitting. Fill in the [brackets] after a live run.
 
-**Project name:** GuardRail Lens
+**Project name:** Juicy Leaks
 
 **Tagline:** Red-team your chatbots, MCP servers and endpoints: attack, score, fix, prove it.
 
 **Track / theme:** Indie track. Push the Frontier (AI safety tooling), also Build for Your World
 (small teams and solo builders in Nigeria shipping bots and agents with no security team).
 
-**Repository:** https://github.com/coderhema/guardrail-lens
+**Repository:** https://github.com/coderhema/juicy-leaks
 
 **Demo video:** [YouTube link, 3 min]
 
 ## What it does
-GuardRail Lens is an automated red team for chatbots. You give it a target: a system prompt plus a model,
+Juicy Leaks is an automated red team for chatbots. You give it a target: a system prompt plus a model,
 or a live HTTP endpoint. It runs 30 jailbreak and prompt-injection templates across 7 categories
 (system-prompt leak, secret exfiltration, PII exfiltration, role-play jailbreaks, indirect injection through
 pasted documents, instruction override and encoding tricks), and uses an attacker Llama to mutate each one
 into a stronger variant. Every reply is graded by a deterministic canary detector (which also catches
 base64, leetspeak, reversed and acrostic leaks) and a Llama judge. You get an overall safety score,
 per-category scores and the worst transcripts. A Llama "prompt-security engineer" then writes a hardened
-system prompt as a diff, and GuardRail Lens re-runs every attack to show the before and after score.
+system prompt as a diff, and Juicy Leaks re-runs every attack to show the before and after score.
 It also works on any deployed chatbot behind an HTTP endpoint.
 
 For **MCP servers** it connects over stdio or streamable HTTP with the official MCP Python SDK, lists the
 tools, and checks for tool-description poisoning (hidden instructions or invisible unicode), prompt
 injection in tool results, secret and PII leakage through tool outputs, and over-broad or dangerous tools
 (shell, unrestricted file write, outbound export). Then a live LLM agent uses the tools while being
-attacked, and GuardRail Lens records whether it follows poisoned instructions, calls dangerous tools
+attacked, and Juicy Leaks records whether it follows poisoned instructions, calls dangerous tools
 (blocked in a sandbox) or leaks data. Each finding has a severity and a concrete fix. A bundled
 vulnerable MCP server and its hardened version show the before and after.
 It ships as a CLI (with `--json` findings and `--fail-under` for CI) and a web app built with Meta's Astryx design system: pick a target, press Run (or "Try the demo"), get a one-sentence verdict, one big score, and an interactive problem map where red paths show exactly how an attack got through. Click any part for the worst transcript and the fix. A Streamlit app is kept as a fallback.
@@ -65,11 +65,12 @@ rule-based fallback, Markdown/JSON reports, an Astryx (React + TypeScript) UI wi
   canary already proves a leak.
 - Keeping the patch useful: the patcher must keep the bot's business content, so there's a validation step
   and a deterministic fallback if the LLM drifts.
+- Our own detector had a false positive on the first live run (a refusal repeating public opening hours); we fixed it and re-graded from the saved transcript.
 - Getting the attacker model to cooperate: it's framed as an authorised test on fake data.
 
 ## Accomplishments
 - End-to-end loop (attack, judge, score, patch, re-test) in one command.
-- Live results: see the "Live results" table in the README (filled from real NIM runs).
+- Live (NVIDIA NIM, Muse Glimmer 30B): NaijaTrust Bank bot scored 100/100 before and after, 0 of 30 attacks leaked. [Add HR, travel and MCP live scores when those runs finish.]
 - MCP: vulnerable demo server [X]/100 -> hardened server [Y]/100.
 - Works fully offline in mock mode, so anyone can try it in 30 seconds.
 

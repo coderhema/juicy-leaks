@@ -261,7 +261,7 @@ async def agent_loop(session, tools: list[dict], target, client, model, allow_da
                 if d and d[0] >= 6:
                     flags.append((9 if d[0] >= 9 else 8, f"Agent called dangerous tool '{name}' ({d[1]})."))
                 if d and d[0] >= 7 and not allow_dangerous:
-                    result = "[blocked by GuardRail Lens sandbox: dangerous tool call recorded, not executed]"
+                    result = "[blocked by Juicy Leaks sandbox: dangerous tool call recorded, not executed]"
                 else:
                     try:
                         result = _text(await session.call_tool(name, args))
@@ -306,7 +306,7 @@ def scan_mcp(target, settings: Settings, agent: bool = True, compare=None, log=p
     tools, results = asyncio.run(_scan_async(target, settings, agent, log))
     fixes = sorted({(r["category"], r["name"], r["fix"]) for r in results if r["fix"]})
     report = {
-        "tool": "GuardRail Lens", "kind": "mcp",
+        "tool": "Juicy Leaks", "kind": "mcp",
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "target": {"name": target.name, "description": target.description,
                    "model": "mock" if settings.mock else settings.target_model},

@@ -2,6 +2,11 @@
 from __future__ import annotations
 
 import os
+
+# Back-compat: the project used to be called GuardRail Lens; honour old GUARDRAIL_* env vars.
+for _k, _v in list(os.environ.items()):
+    if _k.startswith("GUARDRAIL_"):
+        os.environ.setdefault("JUICY_" + _k[len("GUARDRAIL_"):], _v)
 from dataclasses import dataclass
 
 try:
@@ -49,8 +54,8 @@ class Settings:
             raise ValueError(f"Unknown provider '{provider}'. Choose one of: {', '.join(PROVIDERS)}")
         p = PROVIDERS[provider]
         api_key = os.environ.get(p["key_env"]) or os.environ.get("LLM_API_KEY")
-        default_model = model or os.environ.get("GUARDRAIL_MODEL") or p["model"]
-        env_mock = os.environ.get("GUARDRAIL_MOCK", "").lower() in {"1", "true", "yes"}
+        default_model = model or os.environ.get("JUICY_MODEL") or p["model"]
+        env_mock = os.environ.get("JUICY_MOCK", "").lower() in {"1", "true", "yes"}
         if mock is None:
             # No key -> fall back to offline mock mode instead of crashing.
             mock = env_mock or not api_key
@@ -58,11 +63,11 @@ class Settings:
             provider=provider,
             api_key=api_key,
             base_url=(base_url or os.environ.get("LLM_BASE_URL") or p["base_url"]).rstrip("/"),
-            target_model=os.environ.get("GUARDRAIL_TARGET_MODEL") or default_model,
-            attacker_model=os.environ.get("GUARDRAIL_ATTACKER_MODEL") or default_model,
-            judge_model=os.environ.get("GUARDRAIL_JUDGE_MODEL") or default_model,
+            target_model=os.environ.get("JUICY_TARGET_MODEL") or default_model,
+            attacker_model=os.environ.get("JUICY_ATTACKER_MODEL") or default_model,
+            judge_model=os.environ.get("JUICY_JUDGE_MODEL") or default_model,
             mock=mock,
-            extra_body=None if os.environ.get("GUARDRAIL_REASONING_EFFORT") == "off" else (
-                {"reasoning_effort": os.environ["GUARDRAIL_REASONING_EFFORT"]}
-                if os.environ.get("GUARDRAIL_REASONING_EFFORT") else p.get("extra_body")),
+            extra_body=None if os.environ.get("JUICY_REASONING_EFFORT") == "off" else (
+                {"reasoning_effort": os.environ["JUICY_REASONING_EFFORT"]}
+                if os.environ.get("JUICY_REASONING_EFFORT") else p.get("extra_body")),
         )

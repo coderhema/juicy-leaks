@@ -1,9 +1,9 @@
-"""Tiny deliberately vulnerable chatbot HTTP API for testing GuardRail Lens's HTTP target. FAKE data.
+"""Tiny deliberately vulnerable chatbot HTTP API for testing Juicy Leaks's HTTP target. FAKE data.
 
   python examples/http_demo_bot.py [--port 8088] [--live]
 
 POST /chat {"message": "..."} -> {"reply": "..."}
-Offline it uses GuardRail Lens's naive mock bot; with --live it runs bank_bot.yaml's system prompt on
+Offline it uses Juicy Leaks's naive mock bot; with --live it runs bank_bot.yaml's system prompt on
 the configured LLM provider.
 """
 import json
@@ -12,9 +12,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from guardrail_lens.config import Settings  # noqa: E402
-from guardrail_lens.llm import ChatClient  # noqa: E402
-from guardrail_lens.targets import LLMTarget, MockTarget, Target  # noqa: E402
+from juicy_leaks.config import Settings  # noqa: E402
+from juicy_leaks.llm import ChatClient  # noqa: E402
+from juicy_leaks.targets import LLMTarget, MockTarget, Target  # noqa: E402
 
 TARGET = Target.from_yaml(Path(__file__).with_name("bank_bot.yaml"))
 

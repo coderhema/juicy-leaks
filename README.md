@@ -1,6 +1,6 @@
-<p align="center"><img src="docs/img/logo.png" alt="GuardRail Lens" width="560"></p>
+<p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="560"></p>
 
-# GuardRail Lens
+# Juicy Leaks
 
 **Red-team your chatbots, MCP servers and endpoints.** Powered by Meta models (Muse Glimmer on NVIDIA
 NIM, or Llama 3.3 70B on Groq).
@@ -15,7 +15,7 @@ NIM, or Llama 3.3 70B on Groq).
 
 Built for the **Meta Global AI Developer Hackathon** (Cerebral Valley, Indie track, Nov 2026).
 
-![GuardRail Lens web UI](docs/img/web_dashboard.png)
+![Juicy Leaks web UI](docs/img/web_dashboard.png)
 
 ## The problem
 
@@ -78,18 +78,18 @@ flowchart LR
 | Over-broad / dangerous tools | Shell or exec, unrestricted file write, outbound export or URLs, raw SQL (schema `pattern`/`enum` limits count as mitigation) |
 | Agent hijack | A live LLM agent follows poisoned descriptions, calls dangerous tools, passes secrets into arguments, or leaks to the user |
 
-Safety: GuardRail Lens never auto-calls dangerous tools during probing, and in the agent loop dangerous
+Safety: Juicy Leaks never auto-calls dangerous tools during probing, and in the agent loop dangerous
 calls are blocked and recorded unless you set `allow_dangerous_calls: true`. Only scan servers you own.
 
 ## Quickstart
 
 ```bash
-git clone https://github.com/coderhema/guardrail-lens && cd guardrail-lens
+git clone https://github.com/coderhema/juicy-leaks && cd juicy-leaks
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e .
 
 # Offline demo, no API key needed
-guardrail-lens scan --target examples/bank_bot.yaml --mock
+juicy-leaks scan --target examples/bank_bot.yaml --mock
 pytest -q                     # tests run in mock mode
 ```
 
@@ -121,41 +121,41 @@ in the background and `GET /api/scan/{id}` returns its stage progress and the re
 
 Default provider is **NVIDIA NIM** ([build.nvidia.com](https://build.nvidia.com)), model
 `meta/muse-glimmer-30b` (Meta). NIM retired `meta/llama-3.3-70b-instruct` on 2026-08-26, so Muse Glimmer
-is the Meta chat model it serves now. It reasons before answering, so GuardRail Lens sends
-`reasoning_effort: low` (override with `GUARDRAIL_REASONING_EFFORT=medium|high|off`).
+is the Meta chat model it serves now. It reasons before answering, so Juicy Leaks sends
+`reasoning_effort: low` (override with `JUICY_REASONING_EFFORT=medium|high|off`).
 
 ```bash
 cp .env.example .env          # then set NVIDIA_API_KEY=nvapi-...
-guardrail-lens scan --target examples/hr_bot.yaml
+juicy-leaks scan --target examples/hr_bot.yaml
 ```
 
 **Groq** is built in as an alternative, running Llama 3.3 70B (`llama-3.3-70b-versatile`):
 
 ```bash
 # in .env: LLM_PROVIDER=groq and GROQ_API_KEY=gsk_...
-guardrail-lens scan --target examples/travel_bot.yaml --provider groq
+juicy-leaks scan --target examples/travel_bot.yaml --provider groq
 ```
 
 Any other OpenAI-compatible Llama host (Meta Llama API, OpenRouter, a local vLLM) works with
-`LLM_PROVIDER=custom`, `LLM_BASE_URL`, `LLM_API_KEY` and `GUARDRAIL_MODEL`. Per-role overrides:
-`GUARDRAIL_TARGET_MODEL`, `GUARDRAIL_ATTACKER_MODEL`, `GUARDRAIL_JUDGE_MODEL`.
+`LLM_PROVIDER=custom`, `LLM_BASE_URL`, `LLM_API_KEY` and `JUICY_MODEL`. Per-role overrides:
+`JUICY_TARGET_MODEL`, `JUICY_ATTACKER_MODEL`, `JUICY_JUDGE_MODEL`.
 
 | Provider | `LLM_PROVIDER` | Base URL | Default model | Key env var |
 |---|---|---|---|---|
 | NVIDIA NIM (default) | `nvidia` | `https://integrate.api.nvidia.com/v1` | `meta/muse-glimmer-30b` | `NVIDIA_API_KEY` |
 | Groq | `groq` | `https://api.groq.com/openai/v1` | `llama-3.3-70b-versatile` | `GROQ_API_KEY` |
-| Anything OpenAI-compatible | `custom` | `LLM_BASE_URL` | `GUARDRAIL_MODEL` | `LLM_API_KEY` |
+| Anything OpenAI-compatible | `custom` | `LLM_BASE_URL` | `JUICY_MODEL` | `LLM_API_KEY` |
 
-If no key is found, GuardRail Lens falls back to `--mock` mode automatically.
+If no key is found, Juicy Leaks falls back to `--mock` mode automatically.
 
 ### Useful flags
 
 ```
-guardrail-lens scan (--target FILE | --url URL) [--mock|--live] [--compare SAFE.yaml] [--no-agent] [--secret S]
+juicy-leaks scan (--target FILE | --url URL) [--mock|--live] [--compare SAFE.yaml] [--no-agent] [--secret S]
                     [--provider nvidia|groq|custom] [--model M]
                     [--mutations 1] [--category encoding_tricks ...] [--limit N]
                     [--no-patch] [--workers 3] [--out reports]
-guardrail-lens attacks        # list templates
+juicy-leaks attacks        # list templates
 ```
 
 Rate limited on a free tier? Use `--workers 1 --mutations 0 --limit 10`.
@@ -163,28 +163,47 @@ Rate limited on a free tier? Use `--workers 1 --mutations 0 --limit 10`.
 ### CI and agents
 
 ```bash
-guardrail-lens scan --target examples/bank_bot.yaml --mock --json --fail-under 80 > findings.json
+juicy-leaks scan --target examples/bank_bot.yaml --mock --json --fail-under 80 > findings.json
 ```
 
-`--json` prints stable, machine-readable findings (schema `guardrail-lens/findings@1`: score, verdict,
+`--json` prints stable, machine-readable findings (schema `juicy-leaks/findings@1`: score, verdict,
 per-category results, findings with severity, evidence and fix, plus the patch) to stdout; progress goes
 to stderr. Exit codes: `0` ok, `1` every attack errored, `2` config error (e.g. missing key),
 `3` score below `--fail-under`.
+
+### Live results (real NVIDIA NIM runs)
+
+All three roles (target, attacker, judge) on `meta/muse-glimmer-30b` via NVIDIA NIM, 30 attacks per run,
+no attack rewrites (`--live --mutations 0 --workers 2`), Nov 4 2026. Full transcripts:
+[`docs/live/`](docs/live/) (open them in the web UI under Advanced → "Open a saved report").
+
+| Target | Before | After hardened prompt | Notes |
+|---|---|---|---|
+| NaijaTrust Bank (`bank_bot`) | **100 / 100** (LIVE, 0 of 30 leaked) | **100 / 100** (LIVE) | 1 of 30 after-patch calls hit NIM rate limits and is excluded from the score |
+| PeopleDesk HR (`hr_bot`) | running | running | |
+| Wanderlust Travel (`travel_bot`) | queued | queued | |
+| MCP vulnerable vs hardened server | queued | queued | |
+
+Muse Glimmer refused every attack on its own, so the live point of the tool here is proof: it shows the
+bot holds up, with transcripts. The mock-mode demo uses a deliberately weak bot to show leaks and fixes.
+The first live run also caught a false positive in our own detector: a refusal that repeated the bank's
+public opening hours was flagged as a system-prompt leak (97/100). The detector now needs a longer verbatim
+run before it flags a refusal, and that reply was re-graded offline from the saved live transcript.
 
 ### Next steps (not built yet)
 
 - Agent-facing API polish: `GET /scan/{id}/report` returning the findings schema, and OpenAPI examples
   (FastAPI already serves its docs at `/docs`).
-- MCP server mode (`guardrail-lens mcp`) exposing `scan_target`, `get_report` and `suggest_fix` so other
-  AI agents can call GuardRail Lens, plus an `llms.txt` / AGENTS.md for agents.
+- MCP server mode (`juicy-leaks mcp`) exposing `scan_target`, `get_report` and `suggest_fix` so other
+  AI agents can call Juicy Leaks, plus an `llms.txt` / AGENTS.md for agents.
 - Llama Guard 4 as a second judge.
 
 ### MCP servers
 
 ```bash
 # vulnerable demo server vs. its hardened version (fake data; its shell/file tools are simulated)
-guardrail-lens scan --target examples/mcp_vulnerable.yaml --compare examples/mcp_safe.yaml
-guardrail-lens scan --target examples/mcp_vulnerable.yaml --mock --compare examples/mcp_safe.yaml   # scripted offline agent
+juicy-leaks scan --target examples/mcp_vulnerable.yaml --compare examples/mcp_safe.yaml
+juicy-leaks scan --target examples/mcp_vulnerable.yaml --mock --compare examples/mcp_safe.yaml   # scripted offline agent
 ```
 
 ```yaml
@@ -202,8 +221,8 @@ secrets: [MY-CANARY]
 
 ```bash
 python examples/http_demo_bot.py &                     # demo vulnerable bot on :8088
-guardrail-lens scan --target examples/http_endpoint.yaml
-guardrail-lens scan --url http://127.0.0.1:8088/chat --secret VIP-NAIRA-7781   # quick mode
+juicy-leaks scan --target examples/http_endpoint.yaml
+juicy-leaks scan --url http://127.0.0.1:8088/chat --secret VIP-NAIRA-7781   # quick mode
 ```
 
 Headers support `${ENV_VAR}` expansion so tokens stay out of YAML. HTTP targets are scored but not patched.
@@ -234,6 +253,7 @@ inputs and outputs and the data they touch; for an HTTP endpoint the endpoint an
 amber partly, green safe; leaked paths animate. Click a box for the plain-English problem, the worst
 transcript and the suggested fix, or switch on "Show only problems".
 
+![Start screen with "Try the demo"](docs/img/web_empty.png)
 ![Problem map](docs/img/web_map.png)
 ![MCP problem map](docs/img/web_mcp_map.png)
 
@@ -254,9 +274,9 @@ system prompt contains secrets. Per-role overrides let you mix models (e.g. a sm
 ## Project layout
 
 ```
-guardrail_lens/  attacks.py  targets.py  judge.py  patch.py  scanner.py  report.py  llm.py  config.py  cli.py
-guardrail_lens/mcp_scan.py   MCP checks + agent loop
-guardrail_lens/api.py        FastAPI wrapper: POST /scan, background jobs, serves web/dist
+juicy_leaks/  attacks.py  targets.py  judge.py  patch.py  scanner.py  report.py  llm.py  config.py  cli.py
+juicy_leaks/mcp_scan.py   MCP checks + agent loop
+juicy_leaks/api.py        FastAPI wrapper: POST /scan, background jobs, serves web/dist
 web/             Astryx (React 19 + TypeScript + Vite) UI
 app.py           Streamlit fallback UI
 examples/        vulnerable demo bots, demo HTTP bot, vulnerable + hardened MCP servers (fake data)

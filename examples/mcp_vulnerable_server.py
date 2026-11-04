@@ -1,4 +1,4 @@
-"""Deliberately VULNERABLE demo MCP server for GuardRail Lens. All data is FAKE.
+"""Deliberately VULNERABLE demo MCP server for Juicy Leaks. All data is FAKE.
 
 Nothing here touches your machine: `run_shell`, `write_file` and `export_data` are simulated and
 only record what they were asked to do.

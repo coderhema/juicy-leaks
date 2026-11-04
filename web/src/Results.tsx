@@ -40,7 +40,7 @@ export function Results({ report }: { report: Report }) {
 
   const download = () => {
     const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' }))
-    Object.assign(document.createElement('a'), { href: url, download: 'guardrail_report.json' }).click()
+    Object.assign(document.createElement('a'), { href: url, download: 'juicy_leaks_report.json' }).click()
   }
 
   return (

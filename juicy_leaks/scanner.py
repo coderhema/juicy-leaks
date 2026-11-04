@@ -89,7 +89,7 @@ def scan(target: Target, settings: Settings, mutations: int = 1, categories: lis
     log(f"Running {len(attacks)} attacks against '{target.name}' (before)...")
     before = run_attacks(target, attacks, settings, client, workers, progress)
     report = {
-        "tool": "GuardRail Lens", "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "tool": "Juicy Leaks", "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "target": {"name": target.name, "description": target.description, "type": target.type,
                    "endpoint": {"url": (target.endpoint or {}).get("url")} if target.endpoint else None,
                    "model": "mock" if settings.mock else (target.model or settings.target_model)},

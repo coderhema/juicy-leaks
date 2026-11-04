@@ -3,4 +3,4 @@
 set -e
 cd "$(dirname "$0")"
 if [ ! -d web/dist ]; then (cd web && npm ci && npm run build); fi
-exec uvicorn guardrail_lens.api:app --host 127.0.0.1 --port "${PORT:-8000}"
+exec uvicorn juicy_leaks.api:app --host 127.0.0.1 --port "${PORT:-8000}"

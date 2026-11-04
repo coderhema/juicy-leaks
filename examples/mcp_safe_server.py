@@ -1,4 +1,4 @@
-"""Hardened version of the demo MCP server (the "after" for GuardRail Lens). All data is FAKE.
+"""Hardened version of the demo MCP server (the "after" for Juicy Leaks). All data is FAKE.
 
 Fixes: no shell or outbound export tools, file writes are limited to a sandbox with a strict name
 pattern, records are masked and scoped, notes are filtered for secrets and instructions, and tool

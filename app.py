@@ -1,4 +1,4 @@
-"""GuardRail Lens web UI.  Run: streamlit run app.py"""
+"""Juicy Leaks web UI.  Run: streamlit run app.py"""
 from __future__ import annotations
 
 import json
@@ -9,17 +9,17 @@ import pandas as pd
 import streamlit as st
 import yaml
 
-from guardrail_lens.config import DEFAULT_PROVIDER, PROVIDERS, Settings
-from guardrail_lens.mcp_scan import scan_mcp
-from guardrail_lens.report import to_markdown, worst
-from guardrail_lens.scanner import scan
-from guardrail_lens.targets import Target
-from guardrail_lens.ui import CSS, STAGES, counts_from_report, done_states, flow_html, score_cards
+from juicy_leaks.config import DEFAULT_PROVIDER, PROVIDERS, Settings
+from juicy_leaks.mcp_scan import scan_mcp
+from juicy_leaks.report import to_markdown, worst
+from juicy_leaks.scanner import scan
+from juicy_leaks.targets import Target
+from juicy_leaks.ui import CSS, STAGES, counts_from_report, done_states, flow_html, score_cards
 
 ROOT = Path(__file__).resolve().parent
 IMG, EX = ROOT / "docs" / "img", ROOT / "examples"
-st.set_page_config(page_title="GuardRail Lens", layout="wide", initial_sidebar_state="collapsed",
-                   page_icon=str(IMG / "shield.png") if (IMG / "shield.png").exists() else "🛡️")
+st.set_page_config(page_title="Juicy Leaks", layout="wide", initial_sidebar_state="collapsed",
+                   page_icon=str(IMG / "favicon.png") if (IMG / "favicon.png").exists() else "🐞")
 st.markdown(CSS, unsafe_allow_html=True)
 
 TYPES = {"Chatbot": "chatbot", "HTTP endpoint": "http", "MCP server": "mcp"}
@@ -39,9 +39,9 @@ def examples_of(kind: str) -> dict:
 
 
 # ---------- header ----------
-if (IMG / "logo.png").exists():
+if (IMG / "wordmark.png").exists():
     _, mid, _ = st.columns([1, 2, 1])
-    mid.image(str(IMG / "logo.png"), width="stretch")
+    mid.image(str(IMG / "wordmark.png"), width="stretch")
 st.markdown('<div class="card" style="text-align:center"><div class="eyebrow">AI red team for chatbots, MCP servers and endpoints</div>'
             '<div class="hero-title">Find the leak before attackers do.</div>'
             '<p class="hero-sub">Pick a target, press Run scan, read your score. Powered by Meta models.</p></div>',
@@ -190,7 +190,7 @@ with tabs[2]:
 with tabs[3]:
     md = to_markdown(report)
     d1, d2, _ = st.columns([1, 1, 3])
-    d1.download_button("report.md", md, "guardrail_report.md")
-    d2.download_button("report.json", json.dumps(report, indent=2), "guardrail_report.json")
+    d1.download_button("report.md", md, "juicy_leaks_report.md")
+    d2.download_button("report.json", json.dumps(report, indent=2), "juicy_leaks_report.json")
     with st.expander("Preview"):
         st.markdown(md)

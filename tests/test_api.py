@@ -2,7 +2,7 @@ import time
 
 from fastapi.testclient import TestClient
 
-from guardrail_lens.api import app
+from juicy_leaks.api import app
 
 c = TestClient(app)
 

@@ -1,7 +1,7 @@
 """Machine-readable findings, a one-sentence verdict and the attack-surface map for a scan report.
 
-Shared by the web UI, the JSON API, `guardrail-lens scan --json` and the MCP server mode.
-Schema id: guardrail-lens/findings@1 (fields are only ever added, never renamed).
+Shared by the web UI, the JSON API, `juicy-leaks scan --json` and the MCP server mode.
+Schema id: juicy-leaks/findings@1 (fields are only ever added, never renamed).
 """
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 from .patch import RULES
 
-SCHEMA = "guardrail-lens/findings@1"
+SCHEMA = "juicy-leaks/findings@1"
 RANK = {"safe": 0, "partial": 1, "leak": 2}
 
 MCP_FIXES = {
@@ -197,7 +197,7 @@ def surface_map(report: dict, target=None) -> dict:
         u = urlparse(url)
         node("endpoint", u.netloc or "endpoint", "endpoint", 330, 0, info=f"The HTTP endpoint ({url or 'URL not recorded'}).")
         node("bot", f"POST {u.path or '/'}", "route", 600, 0, results, problem="This route returned protected data to an attacker.",
-             fix="Harden the bot's system prompt (run GuardRail Lens on its YAML) and filter replies for secrets.",
+             fix="Harden the bot's system prompt (run Juicy Leaks on its YAML) and filter replies for secrets.",
              info="The chat route the attacks were sent to.")
         for c in cats:
             edge(f"cat:{c}", "endpoint", [r for r in results if r["category"] == c])

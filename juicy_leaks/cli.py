@@ -1,4 +1,4 @@
-"""guardrail-lens command line interface."""
+"""juicy-leaks command line interface."""
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,7 @@ from .targets import Target
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="guardrail-lens", description="Red-team your chatbot with Llama.")
+    p = argparse.ArgumentParser(prog="juicy-leaks", description="Juicy Leaks: red-team your chatbots, MCP servers and endpoints with Meta models.")
     p.add_argument("--version", action="version", version=__version__)
     sub = p.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("scan", help="Attack a target bot and score it")
@@ -35,7 +35,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--no-patch", action="store_true", help="Skip hardened prompt + re-run")
     s.add_argument("--workers", type=int, default=3, help="Parallel requests (lower if rate limited)")
     s.add_argument("--out", default="reports", help="Output directory")
-    s.add_argument("--json", action="store_true", help="Print machine-readable findings (guardrail-lens/findings@1) to stdout")
+    s.add_argument("--json", action="store_true", help="Print machine-readable findings (juicy-leaks/findings@1) to stdout")
     s.add_argument("--fail-under", type=int, metavar="SCORE",
                    help="CI: exit 3 if the target's score (before any fix) is below SCORE")
     sub.add_parser("attacks", help="List the built-in attack templates")

@@ -9,7 +9,7 @@ from pathlib import Path
 import requests
 import yaml
 
-HARDEN_MARKER = "## Security rules (added by GuardRail Lens)"
+HARDEN_MARKER = "## Security rules (added by Juicy Leaks)"
 
 
 @dataclass
@@ -100,7 +100,7 @@ class MockTarget:
     """Deterministic offline stand-in for a naive chatbot.
 
     Unhardened prompts leak often (like real naive bots do); prompts that carry the
-    GuardRail Lens security block refuse almost everything. Lets the whole pipeline,
+    Juicy Leaks security block refuse almost everything. Lets the whole pipeline,
     the UI and the tests run with no API key.
     """
 
