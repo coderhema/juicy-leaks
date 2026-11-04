@@ -1,4 +1,10 @@
 <p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="460"></p>
+<p align="center">
+  <img src="docs/img/mascot/scanning.png" alt="Scanning" width="90">
+  <img src="docs/img/mascot/working.png" alt="Working" width="90">
+  <img src="docs/img/mascot/leak.png" alt="Found a leak" width="90">
+  <img src="docs/img/mascot/clear.png" alt="All clear" width="90">
+</p>
 
 # Juicy Leaks
 
@@ -294,4 +300,4 @@ MIT
 
 ---
 
-Mascot from IP as Logo (ipaslogo.com), free for commercial use.
+Mascot from IP as Logo (ipaslogo.com), free for commercial use. The four poses (scanning, working, leak, all clear) are derived from that mascot.

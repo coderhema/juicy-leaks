@@ -55,6 +55,9 @@ export function Results({ report }: { report: Report }) {
 
       <Card padding={6}>
         <HStack gap={8} vAlign="center" wrap="wrap">
+          <img src={(main.overall ?? 0) >= 90 ? '/mascot/clear.png' : '/mascot/leak.png'} data-testid="verdict-mascot"
+            alt={(main.overall ?? 0) >= 90 ? 'Spider giving a thumbs up: looks safe' : 'Alarmed spider pointing at a leak'}
+            style={{ height: 120, width: 'auto' }} />
           <VStack gap={1} data-testid="big-score">
             <Text type="label" color="secondary">{after ? (isMcp ? 'Hardened server score' : 'Score after the fix') : 'Safety score'}</Text>
             <Heading level={1} type="display-1">{main.overall ?? '–'}<Text type="large" color="secondary"> / 100</Text></Heading>

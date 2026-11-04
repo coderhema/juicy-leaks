@@ -94,7 +94,7 @@ export default function App() {
     <VStack maxWidth={980} width="100%" paddingInline={6} paddingBlock={8} gap={8} style={{ marginInline: 'auto' }}>
       <VStack gap={2}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <img src="/mascot.png" alt="" style={{ height: 64, width: 64, borderRadius: 14 }} />
+          <img src="/mascot.png" alt="" style={{ height: 64, width: 64 }} />
           <span style={{ fontFamily: "Nunito, 'Varela Round', 'SF Pro Rounded', system-ui, sans-serif", fontWeight: 900, fontSize: 44, color: "#14213D", letterSpacing: -0.5 }}>Juicy Leaks</span>
         </div>
         <Text type="large" color="secondary">Red-team your chatbots, MCP servers and endpoints before attackers do.</Text>
@@ -147,12 +147,17 @@ export default function App() {
           <Text type="supporting">Each step lights up as it runs; the numbers show what happened.</Text>
         </VStack>
         <FlowMap kind={kind} states={stages} counts={counts} />
-        {running && status && <Text type="supporting">{status}</Text>}
+        {running && (
+          <HStack gap={3} vAlign="center">
+            <img src="/mascot/working.png" alt="Spider working on a laptop" style={{ height: 72, width: 'auto' }} />
+            <Text type="supporting">{status || 'Scanning…'}</Text>
+          </HStack>
+        )}
       </VStack>
 
       {!report && !running && (
         <EmptyState title="No scan yet" headingLevel={3}
-          icon={<img src="/mascot.png" alt="" style={{ height: 180, width: "auto" }} />}
+          icon={<img src="/mascot/scanning.png" alt="Spider with a magnifying glass" style={{ height: 180, width: "auto" }} />}
           description="Not sure where to start? Run the demo: we attack a fake bank chatbot and show you what leaked and how to fix it. Takes a few seconds, no API key."
           actions={<Button label="Try the demo" variant="primary" onClick={() => run({ example: 'bank_bot', kind: 'chatbot' })} />} />
       )}
