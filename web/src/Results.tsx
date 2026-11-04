@@ -55,7 +55,7 @@ export function Results({ report }: { report: Report }) {
 
       <Card padding={6}>
         <HStack gap={8} vAlign="center" wrap="wrap">
-          <img src={flagged || before.errors ? '/mascot/leak.png' : '/mascot/clear.png'} data-testid="verdict-mascot"
+          <img src={flagged || before.errors ? '/mascot/spider_leak.gif' : '/mascot/clear.png'} data-testid="verdict-mascot"
             alt={flagged || before.errors ? 'Alarmed spider pointing at a leak' : 'Spider giving a thumbs up: nothing leaked'}
             style={{ height: 120, width: 'auto' }} />
           <VStack gap={1} data-testid="big-score">

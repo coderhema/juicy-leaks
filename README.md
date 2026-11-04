@@ -1,6 +1,12 @@
 <p align="center"><img src="docs/img/mascot/juicy_spider.gif" alt="Juicy Leaks spider" width="140"></p>
 <p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="460"></p>
 <p align="center">
+  <img src="docs/img/mascot/spider_walking.gif" alt="Walking" width="110">
+  <img src="docs/img/mascot/spider_thinking.gif" alt="Thinking" width="110">
+  <img src="docs/img/mascot/spider_scanning.gif" alt="Scanning" width="110">
+  <img src="docs/img/mascot/spider_leak.gif" alt="Found a leak" width="110">
+</p>
+<p align="center">
   <img src="docs/img/mascot/scanning.png" alt="Scanning" width="90">
   <img src="docs/img/mascot/working.png" alt="Working" width="90">
   <img src="docs/img/mascot/leak.png" alt="Found a leak" width="90">

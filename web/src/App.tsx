@@ -149,7 +149,7 @@ export default function App() {
         <FlowMap kind={kind} states={stages} counts={counts} />
         {running && (
           <HStack gap={3} vAlign="center">
-            <img src="/mascot/working.png" alt="Spider working on a laptop" style={{ height: 72, width: 'auto' }} />
+            <img src={stages.judge === 'active' || stages.patch === 'active' || stages.rescan === 'active' ? '/mascot/spider_thinking.gif' : '/mascot/spider_walking.gif'} alt="Spider at work" style={{ height: 72, width: 'auto' }} />
             <Text type="supporting">{status || 'Scanning…'}</Text>
           </HStack>
         )}
@@ -157,7 +157,7 @@ export default function App() {
 
       {!report && !running && (
         <EmptyState title="No scan yet" headingLevel={3}
-          icon={<img src="/mascot/scanning.png" alt="Spider with a magnifying glass" style={{ height: 180, width: "auto" }} />}
+          icon={<img src="/mascot/spider_scanning.gif" alt="Spider scanning with a magnifying glass" style={{ height: 180, width: "auto" }} />}
           description="Not sure where to start? Run the demo: we attack a fake bank chatbot and show you what leaked and how to fix it. Takes a few seconds, no API key."
           actions={<Button label="Try the demo" variant="primary" onClick={() => run({ example: 'bank_bot', kind: 'chatbot' })} />} />
       )}
