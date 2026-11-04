@@ -1,21 +1,17 @@
-<p align="center"><img src="docs/img/mascot/juicy_spider.gif" alt="Juicy Leaks spider" width="140"></p>
-<p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="460"></p>
 <p align="center">
-  <img src="docs/img/mascot/spider_walking.gif" alt="Walking" width="110">
-  <img src="docs/img/mascot/spider_thinking.gif" alt="Thinking" width="110">
-  <img src="docs/img/mascot/spider_scanning.gif" alt="Scanning" width="110">
-  <img src="docs/img/mascot/spider_leak.gif" alt="Found a leak" width="110">
+  <img src="docs/img/mascot/juicy_spider.gif" alt="Juicy Leaks spider" width="150"><br>
+  <img src="docs/img/wordmark_text.png" alt="Juicy Leaks" width="380">
 </p>
+<p align="center"><b>Red-team your chatbots, MCP servers and endpoints before attackers do.</b></p>
 <p align="center">
-  <img src="docs/img/mascot/scanning.png" alt="Scanning" width="90">
-  <img src="docs/img/mascot/working.png" alt="Working" width="90">
-  <img src="docs/img/mascot/leak.png" alt="Found a leak" width="90">
-  <img src="docs/img/mascot/clear.png" alt="All clear" width="90">
+  <img alt="Meta Llama / Muse" src="https://img.shields.io/badge/models-Meta-0866FF">
+  <img alt="NVIDIA NIM" src="https://img.shields.io/badge/runs%20on-NVIDIA%20NIM-76B900">
+  <img alt="MCP" src="https://img.shields.io/badge/scans-MCP%20servers-14213D">
+  <img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-3776AB">
 </p>
 
-# Juicy Leaks
 
-**Red-team your chatbots, MCP servers and endpoints.** Powered by Meta models (Muse Glimmer on NVIDIA
+Powered by Meta models (Muse Glimmer on NVIDIA
 NIM, or Llama 3.3 70B on Groq).
 
 - **Chatbots and HTTP endpoints:** 30+ jailbreak and prompt-injection attacks, mutated by an attacker model,
@@ -297,6 +293,23 @@ tests/           pytest, runs offline in mock mode
 docs/            DEMO_SCRIPT.md, SUBMISSION.md, screenshots
 ```
 
+## Meet the spider
+
+The mascot reacts to what the scan is doing.
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/img/mascot/spider_scanning.gif" alt="Scanning" width="140"><br><b>Scanning</b><br><sub>looking for leaks in your bot</sub></td>
+    <td align="center" width="33%"><img src="docs/img/mascot/spider_walking.gif" alt="Walking" width="140"><br><b>Walking</b><br><sub>the scan is running</sub></td>
+    <td align="center" width="33%"><img src="docs/img/mascot/spider_thinking.gif" alt="Thinking" width="140"><br><b>Thinking</b><br><sub>the judge is grading answers</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><img src="docs/img/mascot/spider_leak.gif" alt="Leak found" width="140"><br><b>Leak found</b><br><sub>something sensitive got out</sub></td>
+    <td align="center" width="33%"><img src="docs/img/mascot/clear.png" alt="All clear" width="140"><br><b>All clear</b><br><sub>nothing leaked</sub></td>
+    <td align="center" width="33%"><img src="docs/img/mascot/working.png" alt="Working" width="140"><br><b>Working</b><br><sub>writing the fix</sub></td>
+  </tr>
+</table>
+
 ## Responsible use
 
 Only test bots you own or are authorised to test. All example data is fictional.
@@ -307,4 +320,4 @@ MIT
 
 ---
 
-Mascot from IP as Logo (ipaslogo.com), free for commercial use. The four poses (scanning, working, leak, all clear) are derived from that mascot.
+Mascot from IP as Logo (ipaslogo.com), free for commercial use. The poses and animations are derived from that mascot.
