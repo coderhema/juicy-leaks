@@ -1,0 +1,11 @@
+# Example: test a live chatbot over HTTP instead of a system prompt.
+# Fill in secrets you planted (canaries) so leaks can be detected deterministically.
+name: My Live Bot
+description: your deployed chatbot
+secrets:
+  - CANARY-1234
+endpoint:
+  url: http://localhost:8000/chat
+  headers: {}
+  body_field: message      # request JSON: {"message": "<attack>"}
+  response_field: reply    # response JSON: {"reply": "<answer>"}
