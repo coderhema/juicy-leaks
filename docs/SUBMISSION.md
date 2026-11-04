@@ -31,7 +31,7 @@ injection in tool results, secret and PII leakage through tool outputs, and over
 attacked, and GuardRail Lens records whether it follows poisoned instructions, calls dangerous tools
 (blocked in a sandbox) or leaks data. Each finding has a severity and a concrete fix. A bundled
 vulnerable MCP server and its hardened version show the before and after.
-It ships as a CLI and a Streamlit web app with a target-type picker.
+It ships as a CLI (with `--json` findings and `--fail-under` for CI) and a web app built with Meta's Astryx design system: pick a target, press Run (or "Try the demo"), get a one-sentence verdict, one big score, and an interactive problem map where red paths show exactly how an attack got through. Click any part for the worst transcript and the fix. A Streamlit app is kept as a fallback.
 
 ## Why it matters / inspiration
 Chatbots are going into banks, HR and customer support everywhere, and the system prompts often hold
@@ -52,7 +52,7 @@ when the thing you are testing contains secrets.
 ## How we built it
 Python package with an OpenAI-compatible client (swap providers with one env var), a YAML target format,
 an attack library, a two-stage judge (canary detector, then Llama), a scorer, a patch generator with a
-rule-based fallback, Markdown/JSON reports, a Streamlit UI, and pytest tests that run offline in mock mode.
+rule-based fallback, Markdown/JSON reports, an Astryx (React + TypeScript) UI with a React Flow problem map over a FastAPI wrapper, a Streamlit fallback, and pytest tests that run offline in mock mode.
 
 ## Challenges
 - The model I planned on (Llama 3.3 70B on NIM) had been retired, so the provider layer became
@@ -85,4 +85,4 @@ content, and encoded output), and a short targeted security section fixes most o
 - Larger community-contributed attack library.
 
 ## Built with
-Python, Meta Muse Glimmer, Llama 3.3 70B, NVIDIA NIM, Groq, MCP Python SDK, Streamlit, pandas, pytest.
+Python, Meta Muse Glimmer, Llama 3.3 70B, NVIDIA NIM, Groq, MCP Python SDK, FastAPI, React 19, TypeScript, Astryx, React Flow, Streamlit, pandas, pytest.

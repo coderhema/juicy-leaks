@@ -35,6 +35,9 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--no-patch", action="store_true", help="Skip hardened prompt + re-run")
     s.add_argument("--workers", type=int, default=3, help="Parallel requests (lower if rate limited)")
     s.add_argument("--out", default="reports", help="Output directory")
+    s.add_argument("--json", action="store_true", help="Print machine-readable findings (guardrail-lens/findings@1) to stdout")
+    s.add_argument("--fail-under", type=int, metavar="SCORE",
+                   help="CI: exit 3 if the target's score (before any fix) is below SCORE")
     sub.add_parser("attacks", help="List the built-in attack templates")
     args = p.parse_args(argv)
 
@@ -44,11 +47,31 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{a.id:28} {a.name}")
         return 0
 
+    out = sys.stdout
+    if args.json:  # keep stdout clean for JSON; human output goes to stderr
+        sys.stdout = sys.stderr
+    try:
+        code, report = _scan(p, args)
+    finally:
+        sys.stdout = out
+    if report is not None:
+        if args.json:
+            import json
+            from .findings import summary
+            print(json.dumps(summary(report), indent=2))
+        b = report["before"]["score"]["overall"]
+        if code == 0 and args.fail_under is not None and b is not None and b < args.fail_under:
+            print(f"Score {b} is below --fail-under {args.fail_under}.", file=sys.stderr)
+            return 3
+    return code
+
+
+def _scan(p, args):
     mock = True if args.mock else (False if args.live else None)
     settings = Settings.load(mock=mock, model=args.model, base_url=args.base_url, provider=args.provider)
     if not settings.mock and not settings.api_key:
         print(f"{settings.key_env} is not set. Add it to .env or use --mock.", file=sys.stderr)
-        return 2
+        return 2, None
     if settings.mock and not args.mock:
         print(f"No {settings.key_env} found: running in --mock mode.")
     if args.url:
@@ -71,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     if b["overall"] is None:
         first = next((r["error"] for r in report["before"]["results"] if r["error"]), "")
         print(f"\nAll {b['attacks']} attacks errored, no score. First error: {first[:300]}", file=sys.stderr)
-        return 1
+        return 1, report
     if b["errors"]:
         print(f"Warning: {b['errors']} of {b['attacks']} attacks errored and were excluded from the score.")
     print(f"\nSafety score: {b['overall']}/100  ({b['leaks']} leaks, {b['partials']} partial of {b['attacks']})")
@@ -85,7 +108,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  fix [{f['where']}]: {f['fix']}")
     jp, mp = write_reports(report, args.out)
     print(f"\nReport: {mp}\nJSON:   {jp}")
-    return 0
+    return 0, report
 
 
 if __name__ == "__main__":

@@ -19,3 +19,13 @@ def test_verdict_and_map_chatbot():
     s = summary(r)
     assert s["schema"] == "guardrail-lens/findings@1" and s["findings"][0]["fix"]
     json.dumps(s)
+
+
+def test_cli_json_and_fail_under(tmp_path, capsys):
+    from guardrail_lens.cli import main
+    code = main(["scan", "--target", "examples/bank_bot.yaml", "--mock", "--mutations", "0",
+                 "--out", str(tmp_path), "--json", "--fail-under", "90"])
+    data = json.loads(capsys.readouterr().out)
+    assert code == 3 and data["score"] < 90 and data["findings"]
+    assert main(["scan", "--target", "examples/bank_bot.yaml", "--mock", "--mutations", "0",
+                 "--out", str(tmp_path), "--fail-under", "0"]) == 0

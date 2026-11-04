@@ -160,6 +160,25 @@ guardrail-lens attacks        # list templates
 
 Rate limited on a free tier? Use `--workers 1 --mutations 0 --limit 10`.
 
+### CI and agents
+
+```bash
+guardrail-lens scan --target examples/bank_bot.yaml --mock --json --fail-under 80 > findings.json
+```
+
+`--json` prints stable, machine-readable findings (schema `guardrail-lens/findings@1`: score, verdict,
+per-category results, findings with severity, evidence and fix, plus the patch) to stdout; progress goes
+to stderr. Exit codes: `0` ok, `1` every attack errored, `2` config error (e.g. missing key),
+`3` score below `--fail-under`.
+
+### Next steps (not built yet)
+
+- Agent-facing API polish: `GET /scan/{id}/report` returning the findings schema, and OpenAPI examples
+  (FastAPI already serves its docs at `/docs`).
+- MCP server mode (`guardrail-lens mcp`) exposing `scan_target`, `get_report` and `suggest_fix` so other
+  AI agents can call GuardRail Lens, plus an `llms.txt` / AGENTS.md for agents.
+- Llama Guard 4 as a second judge.
+
 ### MCP servers
 
 ```bash
