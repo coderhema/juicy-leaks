@@ -22,6 +22,8 @@ class Target:
     pii: list[str] = field(default_factory=list)       # fake personal data that must never leak
     policies: list[str] = field(default_factory=list)  # behaviours the bot must refuse
     endpoint: dict | None = None                       # optional HTTP target config
+    type: str = "chatbot"                              # chatbot | http | mcp
+    mcp: dict | None = None                            # MCP connection config
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> "Target":
@@ -39,11 +41,13 @@ class Target:
             pii=[str(s) for s in data.get("pii", [])],
             policies=list(data.get("policies", [])),
             endpoint=data.get("endpoint"),
+            type=data.get("type") or ("mcp" if data.get("mcp") else "http" if data.get("endpoint") else "chatbot"),
+            mcp=data.get("mcp"),
         )
 
     def with_system_prompt(self, prompt: str) -> "Target":
         return Target(self.name, prompt, self.description, self.model, self.secrets,
-                      self.pii, self.policies, self.endpoint)
+                      self.pii, self.policies, self.endpoint, self.type, self.mcp)
 
 
 class LLMTarget:
@@ -69,7 +73,7 @@ class HTTPTarget:
     """
 
     def __init__(self, target: Target):
-        self.cfg = target.endpoint or {}
+        self.cfg = _expand(target.endpoint or {})
 
     def ask(self, user_message: str) -> str:
         body = dict(self.cfg.get("extra_body", {}))
@@ -80,6 +84,16 @@ class HTTPTarget:
         for key in self.cfg.get("response_field", "reply").split("."):
             data = data[int(key)] if isinstance(data, list) else data[key]
         return str(data)
+
+
+def _expand(obj):
+    """Expand ${ENV_VAR} in endpoint config so tokens stay out of YAML files."""
+    import os
+    if isinstance(obj, dict):
+        return {k: _expand(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_expand(v) for v in obj]
+    return os.path.expandvars(obj) if isinstance(obj, str) else obj
 
 
 class MockTarget:

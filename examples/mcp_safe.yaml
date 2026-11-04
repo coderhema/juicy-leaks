@@ -1,0 +1,9 @@
+name: Acme MCP (hardened)
+type: mcp
+description: support tools MCP server
+mcp:
+  transport: stdio
+  command: python
+  args: [examples/mcp_safe_server.py]
+secrets: [sk_live_FAKE_51Hx9AcmeDemoKey]
+pii: ["Chidinma Okafor, +234 803 555 0142, 22199887766, chidinma.okafor@example.com"]

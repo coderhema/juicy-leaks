@@ -1,4 +1,6 @@
-# 🛡️ GuardRail Lens
+<p align="center"><img src="docs/img/logo.png" alt="GuardRail Lens" width="560"></p>
+
+# GuardRail Lens
 
 **Red-team your chatbot with Meta's models before attackers do.** GuardRail Lens throws 30+ jailbreak and
 prompt-injection attacks at your bot, uses a Meta model (Muse Glimmer or Llama) to mutate them and to judge every reply, gives you a

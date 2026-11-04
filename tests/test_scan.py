@@ -37,3 +37,17 @@ def test_streamlit_app_runs_mock_scan(monkeypatch):
     at.button[0].click().run()
     assert not at.exception
     assert any("Safety score" in m.label for m in at.metric)
+
+
+def test_streamlit_app_mcp_target_type(monkeypatch):
+    from streamlit.testing.v1 import AppTest
+
+    monkeypatch.chdir(EX.parent)
+    monkeypatch.setenv("GUARDRAIL_MOCK", "1")
+    at = AppTest.from_file(str(EX.parent / "app.py"), default_timeout=90).run()
+    at.radio[0].set_value("MCP server").run()
+    assert not at.exception
+    at.button[0].click().run()
+    assert not at.exception
+    labels = [m.label for m in at.metric]
+    assert "Hardened server" in labels

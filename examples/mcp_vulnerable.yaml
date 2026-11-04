@@ -1,0 +1,11 @@
+# MCP target: the deliberately vulnerable demo server over stdio. All data is FAKE.
+name: Acme MCP (vulnerable)
+type: mcp
+description: support tools MCP server
+mcp:
+  transport: stdio            # or: http
+  command: python             # "python" means the current interpreter
+  args: [examples/mcp_vulnerable_server.py]
+  # url: http://localhost:8765/mcp   (for transport: http)
+secrets: [sk_live_FAKE_51Hx9AcmeDemoKey]
+pii: ["Chidinma Okafor, +234 803 555 0142, 22199887766, chidinma.okafor@example.com"]

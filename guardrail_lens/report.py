@@ -35,6 +35,11 @@ def to_markdown(report: dict) -> str:
         out += [f"### [{r['verdict'].upper()} sev {r['severity']}] {r['name']} ({r['category']})", "",
                 f"_{r['reason']}_ (detector: {r['detector']})", "", "**Attack:**", "```", r["prompt"], "```",
                 "**Reply:**", "```", r["response"][:800], "```", ""]
+    if report.get("kind") == "mcp":
+        out += ["## Tools discovered", ""] + [f"- `{t['name']}`: {t['description'].strip().splitlines()[0] if t['description'].strip() else ''}" for t in report["tools"]] + [""]
+        if report.get("after"):
+            out += [f"_After = hardened server: {report['after']['target']}_", ""]
+        out += ["## Suggested fixes", ""] + [f"- **{f['where']}** ({f['category']}): {f['fix']}" for f in report.get("fixes", [])] + [""]
     if "patch" in report:
         out += ["## Suggested patch", "", "```diff", report["patch"]["diff"], "```", ""]
     return "\n".join(out)
