@@ -15,7 +15,7 @@ from guardrail_lens.targets import Target
 
 st.set_page_config(page_title="GuardRail Lens", page_icon="🛡️", layout="wide")
 st.title("🛡️ GuardRail Lens")
-st.caption("Red-team your chatbot with Llama: attack, score, patch, re-test.")
+st.caption("Red-team your chatbot with Meta models: attack, score, patch, re-test.")
 
 EXAMPLES = {p.stem: p for p in sorted(Path("examples").glob("*.yaml")) if p.stem != "http_endpoint"}
 
@@ -60,10 +60,13 @@ if not report:
 
 b = report["before"]["score"]
 a = report.get("after", {}).get("score")
+if b["errors"]:
+    st.warning(f"{b['errors']} of {b['attacks']} attacks errored (API/rate limit) and were excluded from the score.")
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Safety score (before)", f"{b['overall']}/100")
 if a:
-    c2.metric("After patch", f"{a['overall']}/100", delta=a["overall"] - b["overall"])
+    c2.metric("After patch", f"{a['overall']}/100",
+              delta=(a["overall"] - b["overall"]) if None not in (a["overall"], b["overall"]) else None)
 c3.metric("Leaks", b["leaks"], delta=(a["leaks"] - b["leaks"]) if a else None, delta_color="inverse")
 c4.metric("Attacks run", b["attacks"])
 st.caption(f"Target: {report['target']['name']} | mode: {report['mode']} | model: {report['target']['model']}")

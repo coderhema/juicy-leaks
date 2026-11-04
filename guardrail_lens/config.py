@@ -13,8 +13,11 @@ except Exception:  # python-dotenv is optional at runtime
 
 # All providers speak the OpenAI-compatible chat completions API.
 PROVIDERS = {
+    # meta/llama-3.3-70b-instruct reached end of life on NIM (2026-08-26); Meta's Muse Glimmer
+    # is the Meta chat model NIM serves now. It reasons before answering, so we ask for low effort.
     "nvidia": {"base_url": "https://integrate.api.nvidia.com/v1",
-               "model": "meta/llama-3.3-70b-instruct", "key_env": "NVIDIA_API_KEY"},
+               "model": "meta/muse-glimmer-30b", "key_env": "NVIDIA_API_KEY",
+               "extra_body": {"reasoning_effort": "low"}},
     "groq": {"base_url": "https://api.groq.com/openai/v1",
              "model": "llama-3.3-70b-versatile", "key_env": "GROQ_API_KEY"},
     # any other OpenAI-compatible endpoint (Meta Llama API, OpenRouter, Together, local vLLM...)
@@ -32,6 +35,7 @@ class Settings:
     attacker_model: str
     judge_model: str
     mock: bool
+    extra_body: dict | None = None
 
     @property
     def key_env(self) -> str:
@@ -58,4 +62,7 @@ class Settings:
             attacker_model=os.environ.get("GUARDRAIL_ATTACKER_MODEL") or default_model,
             judge_model=os.environ.get("GUARDRAIL_JUDGE_MODEL") or default_model,
             mock=mock,
+            extra_body=None if os.environ.get("GUARDRAIL_REASONING_EFFORT") == "off" else (
+                {"reasoning_effort": os.environ["GUARDRAIL_REASONING_EFFORT"]}
+                if os.environ.get("GUARDRAIL_REASONING_EFFORT") else p.get("extra_body")),
         )

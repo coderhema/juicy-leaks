@@ -30,7 +30,8 @@ def _run_one(runner, target, attack: Attack, client, judge_model):
 def score(results: list[dict]) -> dict:
     valid = [r for r in results if r["verdict"] != "error"]
     n = len(valid) or 1
-    overall = round(100 * (1 - sum(r["severity"] for r in valid) / (10 * n)))
+    # all calls failed -> no score (previously this showed a misleading 100/100)
+    overall = round(100 * (1 - sum(r["severity"] for r in valid) / (10 * n))) if valid else None
     cats = {}
     for c, label in CATEGORIES.items():
         rs = [r for r in valid if r["category"] == c]
@@ -61,7 +62,7 @@ def run_attacks(target: Target, attacks: list[Attack], settings: Settings, clien
 
 def scan(target: Target, settings: Settings, mutations: int = 1, categories: list[str] | None = None,
          limit: int | None = None, patch: bool = True, workers: int = 4, progress=None, log=print) -> dict:
-    client = None if settings.mock else ChatClient(settings.api_key, settings.base_url)
+    client = None if settings.mock else ChatClient(settings.api_key, settings.base_url, extra_body=settings.extra_body)
     attacks = builtin_attacks()
     if categories:
         attacks = [a for a in attacks if a.category in categories]
@@ -70,12 +71,14 @@ def scan(target: Target, settings: Settings, mutations: int = 1, categories: lis
     if mutations > 0:
         log(f"Mutating {len(attacks)} attacks x{mutations} with the attacker LLM...")
         context = f"{target.name}: {target.description}"
-        extra = []
-        for a in attacks:
+        def _mut(a):
             try:
-                extra += mutate_attack(a, client, settings.attacker_model, context, mutations)
+                return mutate_attack(a, client, settings.attacker_model, context, mutations)
             except Exception as e:
                 log(f"  mutation failed for {a.id}: {e}")
+                return []
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+            extra = [v for vs in pool.map(_mut, attacks) for v in vs]
         attacks = attacks + extra
 
     log(f"Running {len(attacks)} attacks against '{target.name}' (before)...")

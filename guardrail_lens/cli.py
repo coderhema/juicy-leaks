@@ -21,7 +21,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--mock", action="store_true", help="Offline mode with canned responses (no API key)")
     s.add_argument("--live", action="store_true", help="Force live mode (requires the provider API key)")
     s.add_argument("--provider", choices=list(PROVIDERS), help="LLM provider (default nvidia, or LLM_PROVIDER env)")
-    s.add_argument("--model", help="Model for target/attacker/judge (default per provider, e.g. meta/llama-3.3-70b-instruct)")
+    s.add_argument("--model", help="Model for target/attacker/judge (default per provider, e.g. meta/muse-glimmer-30b)")
     s.add_argument("--base-url", help="Override the OpenAI-compatible base URL")
     s.add_argument("--mutations", type=int, default=1, help="Attacker-LLM variants per template (default 1)")
     s.add_argument("--category", action="append", choices=list(CATEGORIES), help="Only run these categories")
@@ -49,6 +49,12 @@ def main(argv: list[str] | None = None) -> int:
     report = scan(target, settings, mutations=args.mutations, categories=args.category,
                   limit=args.limit, patch=not args.no_patch, workers=args.workers)
     b = report["before"]["score"]
+    if b["overall"] is None:
+        first = next((r["error"] for r in report["before"]["results"] if r["error"]), "")
+        print(f"\nAll {b['attacks']} attacks errored, no score. First error: {first[:300]}", file=sys.stderr)
+        return 1
+    if b["errors"]:
+        print(f"Warning: {b['errors']} of {b['attacks']} attacks errored and were excluded from the score.")
     print(f"\nSafety score: {b['overall']}/100  ({b['leaks']} leaks, {b['partials']} partial of {b['attacks']})")
     for c in b["categories"].values():
         bar = "#" * (c["score"] // 5)

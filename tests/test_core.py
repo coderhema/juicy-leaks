@@ -60,7 +60,13 @@ def test_provider_defaults(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     s = Settings.load()
     assert s.provider == "nvidia" and s.base_url == "https://integrate.api.nvidia.com/v1"
-    assert s.target_model == "meta/llama-3.3-70b-instruct" and s.mock  # no key -> mock
+    assert s.target_model == "meta/muse-glimmer-30b" and s.mock  # no key -> mock
     monkeypatch.setenv("GROQ_API_KEY", "x")
     g = Settings.load(provider="groq")
     assert g.base_url == "https://api.groq.com/openai/v1" and g.target_model == "llama-3.3-70b-versatile" and not g.mock
+
+
+def test_all_errors_gives_no_score():
+    from guardrail_lens.scanner import score
+    s = score([{"category": "encoding_tricks", "verdict": "error", "severity": 0}])
+    assert s["overall"] is None and s["errors"] == 1

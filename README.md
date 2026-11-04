@@ -1,7 +1,7 @@
 # 🛡️ GuardRail Lens
 
-**Red-team your chatbot with Llama before attackers do.** GuardRail Lens throws 30+ jailbreak and
-prompt-injection attacks at your bot, uses Llama to mutate them and to judge every reply, gives you a
+**Red-team your chatbot with Meta's models before attackers do.** GuardRail Lens throws 30+ jailbreak and
+prompt-injection attacks at your bot, uses a Meta model (Muse Glimmer or Llama) to mutate them and to judge every reply, gives you a
 safety score per category with the worst transcripts, then writes a hardened system prompt (as a diff)
 and re-runs the attacks to prove the fix works.
 
@@ -22,14 +22,14 @@ that says *how* leaky their bot is, *where*, and *how to fix it*.
 ```mermaid
 flowchart LR
     T[Target bot<br/>system prompt + model<br/>or HTTP endpoint] --> R
-    A[30 attack templates<br/>7 categories] --> M[Attacker Llama<br/>mutates attacks]
+    A[30 attack templates<br/>7 categories] --> M[Attacker model<br/>mutates attacks]
     M --> R[Run attacks]
     A --> R
     R --> J{Judge}
     J -->|canary match:<br/>plain, base64, leet,<br/>reversed, acrostic| S[Score + report]
-    J -->|no canary| L[Judge Llama<br/>leak / partial / safe]
+    J -->|no canary| L[Judge model<br/>leak / partial / safe]
     L --> S
-    S --> P[Patch Llama<br/>hardened system prompt + diff]
+    S --> P[Patcher model<br/>hardened system prompt + diff]
     P --> RR[Re-run same attacks]
     RR --> BA[Before / after score]
 ```
@@ -38,13 +38,13 @@ flowchart LR
    PII exfiltration, role-play jailbreak (DAN, "grandma"), indirect injection (instructions hidden in a
    pasted invoice, email, web page or review), instruction override (fake system turns, "policy updates"),
    and encoding tricks (base64, leetspeak, reversed text, acrostics).
-2. **Mutation**: an attacker Llama rewrites each template into a sneakier variant (`--mutations N`).
+2. **Mutation**: an attacker model rewrites each template into a sneakier variant (`--mutations N`).
 3. **Judging**: a deterministic *canary detector* first looks for the bot's known secrets and fake PII
    in the reply, including obfuscated forms (base64-decoded chunks, leetspeak, reversed, first-letter
-   acrostics) and verbatim chunks of the system prompt. If it finds nothing, a **Llama judge** grades the
+   acrostics) and verbatim chunks of the system prompt. If it finds nothing, an **LLM judge** grades the
    reply as `leak`, `partial` or `safe` with a 0-10 severity and a reason.
 4. **Scoring**: overall safety score 0-100 and per-category scores, plus the worst transcripts.
-5. **Patch**: a Llama prompt-security engineer rewrites the system prompt, adding a security section
+5. **Patch**: an LLM prompt-security engineer rewrites the system prompt, adding a security section
    targeted at the categories that failed (with a deterministic rule-based fallback). You get a unified diff.
 6. **Re-test**: the exact same attacks run against the hardened prompt, so you see the before/after score.
 
@@ -61,17 +61,19 @@ streamlit run app.py          # web UI, toggle "Mock mode"
 pytest -q                     # tests run in mock mode
 ```
 
-### With a real Llama model
+### With a real model
 
 Default provider is **NVIDIA NIM** ([build.nvidia.com](https://build.nvidia.com)), model
-`meta/llama-3.3-70b-instruct`:
+`meta/muse-glimmer-30b` (Meta). NIM retired `meta/llama-3.3-70b-instruct` on 2026-08-26, so Muse Glimmer
+is the Meta chat model it serves now. It reasons before answering, so GuardRail Lens sends
+`reasoning_effort: low` (override with `GUARDRAIL_REASONING_EFFORT=medium|high|off`).
 
 ```bash
 cp .env.example .env          # then set NVIDIA_API_KEY=nvapi-...
 guardrail-lens scan --target examples/hr_bot.yaml
 ```
 
-**Groq** is built in as an alternative (`llama-3.3-70b-versatile`):
+**Groq** is built in as an alternative, running Llama 3.3 70B (`llama-3.3-70b-versatile`):
 
 ```bash
 # in .env: LLM_PROVIDER=groq and GROQ_API_KEY=gsk_...
@@ -84,7 +86,7 @@ Any other OpenAI-compatible Llama host (Meta Llama API, OpenRouter, a local vLLM
 
 | Provider | `LLM_PROVIDER` | Base URL | Default model | Key env var |
 |---|---|---|---|---|
-| NVIDIA NIM (default) | `nvidia` | `https://integrate.api.nvidia.com/v1` | `meta/llama-3.3-70b-instruct` | `NVIDIA_API_KEY` |
+| NVIDIA NIM (default) | `nvidia` | `https://integrate.api.nvidia.com/v1` | `meta/muse-glimmer-30b` | `NVIDIA_API_KEY` |
 | Groq | `groq` | `https://api.groq.com/openai/v1` | `llama-3.3-70b-versatile` | `GROQ_API_KEY` |
 | Anything OpenAI-compatible | `custom` | `LLM_BASE_URL` | `GUARDRAIL_MODEL` | `LLM_API_KEY` |
 
@@ -126,12 +128,13 @@ transcripts with the judge's reason, and the patch diff.
 
 > Screenshots are from mock mode, so the numbers are illustrative, not a benchmark of any model.
 
-## How Llama is used
+## How Meta models are used
 
-Llama 3.3 70B plays four roles: the **target** (runs your system prompt), the **attacker** (mutates
+One Meta model plays four roles: the **target** (runs your system prompt), the **attacker** (mutates
 attacks), the **judge** (grades replies when no canary fires) and the **patcher** (writes the hardened
-prompt). Using an open-weights model end to end means the whole red-team loop can run on infrastructure
-you control, which matters when your system prompt contains secrets.
+prompt). By default that's **Muse Glimmer 30B** on NVIDIA NIM. With `--provider groq` it's **Llama 3.3 70B**,
+and with `custom` any Llama host, including open-weights Llama on your own hardware, which matters when your
+system prompt contains secrets. Per-role overrides let you mix models (e.g. a small fast judge).
 
 ## Project layout
 

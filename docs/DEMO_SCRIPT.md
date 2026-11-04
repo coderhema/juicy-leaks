@@ -13,7 +13,7 @@ Tip: if the live API is slow, record the live CLI scan with `--limit 10 --mutati
 | 1:45-2:10 | "Worst transcripts" tab, expand the top leak | "Here's the proof: I asked it to print its instructions and it handed over the fee-waiver code and the API key. Every finding comes with the attack, the reply and the judge's reason." |
 | 2:10-2:35 | "Patch diff" tab, scroll the green lines | "Now the fix. A Llama prompt-security engineer rewrites the system prompt with rules targeted at exactly the categories that failed. You get a diff you can paste straight into production." |
 | 2:35-2:50 | Back to the metrics: Before vs After, chart with both bars | "Then it re-runs the same attacks against the hardened prompt. Score goes from (before) to (after). Measured, not guessed." |
-| 2:50-3:00 | README: provider table, GitHub URL | "It runs on Llama 3.3 70B through NVIDIA NIM or Groq, works on any OpenAI-compatible endpoint or a live HTTP bot, and it's open source. GuardRail Lens: find the leak before attackers do." |
+| 2:50-3:00 | README: provider table, GitHub URL | "It runs on Meta models: Muse Glimmer on NVIDIA NIM, or Llama 3.3 70B on Groq, works on any OpenAI-compatible endpoint or a live HTTP bot, and it's open source. GuardRail Lens: find the leak before attackers do." |
 
 Notes
 - Say clearly if a shot is mock mode. Real numbers should come from a live run.

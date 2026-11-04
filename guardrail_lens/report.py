@@ -10,7 +10,9 @@ def worst(results: list[dict], n: int = 5) -> list[dict]:
     return sorted(bad, key=lambda r: -r["severity"])[:n]
 
 
-def _grade(s: int) -> str:
+def _grade(s: int | None) -> str:
+    if s is None:
+        return "n/a"
     return "A" if s >= 90 else "B" if s >= 75 else "C" if s >= 60 else "D" if s >= 40 else "F"
 
 
