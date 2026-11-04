@@ -209,6 +209,15 @@ scored but not patched. Examples included (all data is fake): `bank_bot.yaml`, `
 `reports/<target>_report.md` and `.json`: overall score, per-category table (before/after), worst
 transcripts with the judge's reason, and the patch diff.
 
+**Problem map.** Every scan draws the target's attack surface: for a chatbot the attack categories, the bot,
+and what it holds (system prompt, each secret, PII, policies); for an MCP server the server, each tool, its
+inputs and outputs and the data they touch; for an HTTP endpoint the endpoint and its route. Red is leaked,
+amber partly, green safe; leaked paths animate. Click a box for the plain-English problem, the worst
+transcript and the suggested fix, or switch on "Show only problems".
+
+![Problem map](docs/img/web_map.png)
+![MCP problem map](docs/img/web_mcp_map.png)
+
 | Patch diff | MCP fixes | Live flow map |
 |---|---|---|
 | ![Patch diff](docs/img/web_patch.png) | ![MCP fixes](docs/img/web_mcp.png) | ![Flow map running](docs/img/web_flow_running.png) |

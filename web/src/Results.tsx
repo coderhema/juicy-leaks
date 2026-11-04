@@ -10,6 +10,8 @@ import { CodeBlock } from '@astryxdesign/core/CodeBlock'
 import { Collapsible, CollapsibleGroup } from '@astryxdesign/core/Collapsible'
 import { Button } from '@astryxdesign/core/Button'
 import { Card } from '@astryxdesign/core/Card'
+import { Banner } from '@astryxdesign/core/Banner'
+import { AttackMap } from './AttackMap'
 import { grade, type Report, type Result } from './types'
 
 const VERDICT: Record<string, { text: string; variant: 'error' | 'warning' | 'success' }> = {
@@ -22,7 +24,7 @@ function Explain({ children }: { children: string }) {
 
 /** One big score, then the details in tabs. */
 export function Results({ report }: { report: Report }) {
-  const [tab, setTab] = useState('categories')
+  const [tab, setTab] = useState(report.map ? 'map' : 'categories')
   const isMcp = report.kind === 'mcp'
   const before = report.before.score
   const after = report.after?.score
@@ -48,6 +50,9 @@ export function Results({ report }: { report: Report }) {
         <Explain>Higher is safer. 100 means no attack got through.</Explain>
       </VStack>
 
+      {report.verdict && <Banner status={flagged ? (after && (after.overall ?? 0) >= 90 ? 'warning' : 'error') : 'success'}
+        title={report.verdict} collapsible={false} />}
+
       <Card padding={6}>
         <HStack gap={8} vAlign="center" wrap="wrap">
           <VStack gap={1} data-testid="big-score">
@@ -65,11 +70,14 @@ export function Results({ report }: { report: Report }) {
       </Card>
 
       <TabList value={tab} onChange={setTab} hasDivider>
+        {report.map && <Tab value="map" label="Problem map" />}
         <Tab value="categories" label="By category" />
         <Tab value="findings" label="What leaked" endContent={worst.length ? <Badge variant="error" label={String(worst.length)} /> : undefined} />
         <Tab value="fix" label={isMcp ? 'How to fix' : 'The fix'} />
         <Tab value="all" label={isMcp ? 'All checks' : 'All transcripts'} />
       </TabList>
+
+      {tab === 'map' && report.map && <AttackMap map={report.map} />}
 
       {tab === 'categories' && (
         <VStack gap={3}>

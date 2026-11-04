@@ -321,4 +321,5 @@ def scan_mcp(target, settings: Settings, agent: bool = True, compare=None, log=p
         tools2, results2 = asyncio.run(_scan_async(compare, settings, agent, log))
         report["after"] = {"score": score(results2, MCP_CATEGORIES), "results": results2,
                            "target": compare.name, "tools": tools2}
-    return report
+    from .findings import enrich
+    return enrich(report, target)

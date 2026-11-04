@@ -13,6 +13,7 @@
     "@astryxdesign/core": "^0.7.8",
     "@astryxdesign/theme-neutral": "^0.7.8",
     "@stylexjs/stylex": "^0.19.1",
+    "@xyflow/react": "^12.12.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

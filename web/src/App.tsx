@@ -12,6 +12,7 @@ import { FileInput } from '@astryxdesign/core/FileInput'
 import { Banner } from '@astryxdesign/core/Banner'
 import { Divider } from '@astryxdesign/core/Divider'
 import { Grid } from '@astryxdesign/core/Grid'
+import { EmptyState } from '@astryxdesign/core/EmptyState'
 import { getConfig, getExamples, getJob, startScan } from './api'
 import { FlowMap } from './FlowMap'
 import { Results } from './Results'
@@ -60,11 +61,13 @@ export default function App() {
     setReport(r); setStages(allDone()); setCounts(countsFromReport(r)); setKind((r.kind as Kind) ?? kind)
   }
 
-  const run = async () => {
+  const run = async (override?: { example: string; kind: Kind }) => {
+    const ex = override?.example ?? exampleId
+    if (override) { setKind(override.kind); setExampleId(override.example) }
     setError(null); setReport(null); setCounts({}); setStages({ target: 'active' }); setRunning(true); setStatus('Starting…')
     try {
       const { id } = await startScan({
-        example: exampleId, mock: !live, provider, mutations, limit: limit || null, compare, agent,
+        example: ex, mock: override ? true : !live, provider, mutations, limit: limit || null, compare, agent,
       })
       poll.current = window.setInterval(async () => {
         try {
@@ -107,8 +110,9 @@ export default function App() {
         <Grid columns={{ minWidth: 280 }} gap={4} align="end">
           <Selector label="Example" options={options} value={exampleId} onChange={v => v && setExampleId(v)} size="lg" />
           <HStack gap={3} vAlign="center">
-            <Button label={running ? 'Scanning…' : 'Run scan'} variant="primary" size="lg" isLoading={running} onClick={run} isDisabled={!selected} />
-            <Switch label="Advanced" value={advanced} onChange={setAdvanced} />
+            <Button label={running ? 'Scanning…' : 'Run scan'} variant="primary" size="lg" isLoading={running} onClick={() => run()} isDisabled={!selected}
+              tooltip="Sends about 30 attacks to the target, grades every reply, then writes and tests a fix." />
+            <Switch label="Advanced" value={advanced} onChange={setAdvanced} labelTooltip="Live model, provider, number of attacks, open a saved report." />
           </HStack>
         </Grid>
         {kind === 'http' && <Text type="supporting">The demo endpoint starts by itself. Endpoints are scored but not patched, since we can't edit their prompt.</Text>}
@@ -142,6 +146,12 @@ export default function App() {
         <FlowMap kind={kind} states={stages} counts={counts} />
         {running && status && <Text type="supporting">{status}</Text>}
       </VStack>
+
+      {!report && !running && (
+        <EmptyState title="No scan yet" headingLevel={3}
+          description="Not sure where to start? Run the demo: we attack a fake bank chatbot and show you what leaked and how to fix it. Takes a few seconds, no API key."
+          actions={<Button label="Try the demo" variant="primary" onClick={() => run({ example: 'bank_bot', kind: 'chatbot' })} />} />
+      )}
 
       {report && <><Divider /><Results report={report} /></>}
     </VStack>

@@ -23,6 +23,7 @@ export interface Report {
   before: Phase; after?: Phase
   patch?: { hardened_system_prompt: string; diff: string }
   fixes?: { category: string; where: string; fix: string }[]
+  verdict?: string; map?: SurfaceMap
 }
 export interface Job {
   id: string; status: 'running' | 'done' | 'error'
@@ -65,3 +66,10 @@ export function countsFromReport(r: Report): Record<string, string> {
   if (r.after) c.rescan = r.after.score.overall === null ? '–' : `${r.after.score.overall}/100`
   return c
 }
+
+export interface MapNode {
+  id: string; label: string; type: string; x: number; y: number
+  status: 'leak' | 'partial' | 'safe' | 'info'; stats: string; problem: string; fix: string; info: string
+  worst: { name: string; attack: string; reply: string; reason: string; severity: number; verdict: string } | null
+}
+export interface SurfaceMap { kind: string; nodes: MapNode[]; edges: { id: string; source: string; target: string; status: string }[] }

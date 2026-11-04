@@ -90,7 +90,8 @@ def scan(target: Target, settings: Settings, mutations: int = 1, categories: lis
     before = run_attacks(target, attacks, settings, client, workers, progress)
     report = {
         "tool": "GuardRail Lens", "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "target": {"name": target.name, "description": target.description,
+        "target": {"name": target.name, "description": target.description, "type": target.type,
+                   "endpoint": {"url": (target.endpoint or {}).get("url")} if target.endpoint else None,
                    "model": "mock" if settings.mock else (target.model or settings.target_model)},
         "mode": "mock" if settings.mock else "live",
         "models": {"provider": settings.provider, "target": settings.target_model, "attacker": settings.attacker_model,
@@ -105,4 +106,5 @@ def scan(target: Target, settings: Settings, mutations: int = 1, categories: lis
         after = run_attacks(target.with_system_prompt(hardened), attacks, settings, client, workers, progress)
         report["patch"] = {"hardened_system_prompt": hardened, "diff": make_diff(target.system_prompt, hardened)}
         report["after"] = {"score": score(after), "results": after}
-    return report
+    from .findings import enrich
+    return enrich(report, target)
