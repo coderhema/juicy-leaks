@@ -15,7 +15,7 @@ NIM, or Llama 3.3 70B on Groq).
 
 Built for the **Meta Global AI Developer Hackathon** (Cerebral Valley, Indie track, Nov 2026).
 
-![Dashboard](docs/img/dashboard.png)
+![GuardRail Lens web UI](docs/img/web_dashboard.png)
 
 ## The problem
 
@@ -90,9 +90,32 @@ pip install -r requirements.txt && pip install -e .
 
 # Offline demo, no API key needed
 guardrail-lens scan --target examples/bank_bot.yaml --mock
-streamlit run app.py          # web UI, toggle "Mock mode"
 pytest -q                     # tests run in mock mode
 ```
+
+### Web UI (Astryx)
+
+The main UI is a small React + TypeScript app built with Meta's [Astryx](https://astryx.atmeta.com) design
+system, served by a thin FastAPI wrapper around the scanner. It needs Node 20+.
+
+```bash
+./run_web.sh                  # builds web/ once, then serves UI + API on http://127.0.0.1:8000
+```
+
+Pick a target type (Chatbot / HTTP endpoint / MCP server), pick an example, press **Run scan**. The flow map
+(Target → Attacks → Replies → Judge → Score → Patch → Re-scan) lights up as the scan runs, then you get one
+big score with the details in tabs. Scans run in mock mode by default; switch on **Advanced → Use a real
+model** for a live run (needs `NVIDIA_API_KEY` on the server). The API is usable on its own too:
+
+```bash
+curl -s -X POST localhost:8000/scan -H 'Content-Type: application/json' \
+  -d '{"example": "bank_bot", "mock": true}'          # or "mcp_vulnerable", "http_endpoint"; "mock": false for live
+```
+
+`POST /scan` also takes an inline `"target": {...}` (same fields as the YAML). `POST /api/scan` starts a scan
+in the background and `GET /api/scan/{id}` returns its stage progress and the report.
+
+**Fallback UI:** `streamlit run app.py` (needs no Node).
 
 ### With a real model
 
@@ -186,8 +209,9 @@ scored but not patched. Examples included (all data is fake): `bank_bot.yaml`, `
 `reports/<target>_report.md` and `.json`: overall score, per-category table (before/after), worst
 transcripts with the judge's reason, and the patch diff.
 
-![Patch diff](docs/img/patch_diff.png)
-![Transcripts](docs/img/transcripts.png)
+| Patch diff | MCP fixes | Live flow map |
+|---|---|---|
+| ![Patch diff](docs/img/web_patch.png) | ![MCP fixes](docs/img/web_mcp.png) | ![Flow map running](docs/img/web_flow_running.png) |
 
 > Screenshots are from mock mode, so the numbers are illustrative, not a benchmark of any model.
 
@@ -204,7 +228,9 @@ system prompt contains secrets. Per-role overrides let you mix models (e.g. a sm
 ```
 guardrail_lens/  attacks.py  targets.py  judge.py  patch.py  scanner.py  report.py  llm.py  config.py  cli.py
 guardrail_lens/mcp_scan.py   MCP checks + agent loop
-app.py           Streamlit UI (target type: chatbot / HTTP endpoint / MCP server)
+guardrail_lens/api.py        FastAPI wrapper: POST /scan, background jobs, serves web/dist
+web/             Astryx (React 19 + TypeScript + Vite) UI
+app.py           Streamlit fallback UI
 examples/        vulnerable demo bots, demo HTTP bot, vulnerable + hardened MCP servers (fake data)
 tests/           pytest, runs offline in mock mode
 docs/            DEMO_SCRIPT.md, SUBMISSION.md, screenshots

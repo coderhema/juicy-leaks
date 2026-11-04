@@ -9,3 +9,7 @@ __pycache__/
 .pytest_cache/
 reports/
 .streamlit/secrets.toml
+
+# web UI
+web/node_modules/
+web/dist/
