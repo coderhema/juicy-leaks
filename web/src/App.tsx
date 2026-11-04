@@ -93,7 +93,10 @@ export default function App() {
   return (
     <VStack maxWidth={980} width="100%" paddingInline={6} paddingBlock={8} gap={8} style={{ marginInline: 'auto' }}>
       <VStack gap={2}>
-        <img src="/wordmark.png" alt="Juicy Leaks" style={{ height: 88, width: "auto", alignSelf: "flex-start" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <img src="/mascot.png" alt="" style={{ height: 64, width: 64, borderRadius: 14 }} />
+          <span style={{ fontFamily: "Nunito, 'Varela Round', 'SF Pro Rounded', system-ui, sans-serif", fontWeight: 900, fontSize: 44, color: "#14213D", letterSpacing: -0.5 }}>Juicy Leaks</span>
+        </div>
         <Text type="large" color="secondary">Red-team your chatbots, MCP servers and endpoints before attackers do.</Text>
       </VStack>
 

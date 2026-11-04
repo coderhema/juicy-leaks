@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="560"></p>
+<p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="460"></p>
 
 # Juicy Leaks
 
@@ -291,3 +291,7 @@ Only test bots you own or are authorised to test. All example data is fictional.
 ## License
 
 MIT
+
+---
+
+Mascot from IP as Logo (ipaslogo.com), free for commercial use.
