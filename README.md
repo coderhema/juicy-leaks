@@ -1,3 +1,4 @@
+<p align="center"><img src="docs/img/mascot/juicy_spider.gif" alt="Juicy Leaks spider" width="140"></p>
 <p align="center"><img src="docs/img/wordmark.png" alt="Juicy Leaks" width="460"></p>
 <p align="center">
   <img src="docs/img/mascot/scanning.png" alt="Scanning" width="90">

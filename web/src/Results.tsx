@@ -55,8 +55,8 @@ export function Results({ report }: { report: Report }) {
 
       <Card padding={6}>
         <HStack gap={8} vAlign="center" wrap="wrap">
-          <img src={(main.overall ?? 0) >= 90 ? '/mascot/clear.png' : '/mascot/leak.png'} data-testid="verdict-mascot"
-            alt={(main.overall ?? 0) >= 90 ? 'Spider giving a thumbs up: looks safe' : 'Alarmed spider pointing at a leak'}
+          <img src={flagged || before.errors ? '/mascot/leak.png' : '/mascot/clear.png'} data-testid="verdict-mascot"
+            alt={flagged || before.errors ? 'Alarmed spider pointing at a leak' : 'Spider giving a thumbs up: nothing leaked'}
             style={{ height: 120, width: 'auto' }} />
           <VStack gap={1} data-testid="big-score">
             <Text type="label" color="secondary">{after ? (isMcp ? 'Hardened server score' : 'Score after the fix') : 'Safety score'}</Text>
@@ -97,19 +97,21 @@ export function Results({ report }: { report: Report }) {
       {tab === 'findings' && (
         <VStack gap={3}>
           <Explain>The worst findings first: what was asked and what came back.</Explain>
-          {worst.length ? <Transcripts rows={worst.slice(0, 12)} open /> : <Text>Nothing leaked. Every attack was refused.</Text>}
+          {worst.length ? <Transcripts rows={worst.slice(0, 12)} open /> : <HStack gap={3} vAlign="center"><img src="/mascot/clear.png" alt="" style={{ height: 56, width: 'auto' }} /><Text>Nothing leaked. Every attack was refused.</Text></HStack>}
         </VStack>
       )}
 
       {tab === 'fix' && (isMcp ? (
         <VStack gap={3}>
-          <Explain>Concrete changes for the server, one per problem found.</Explain>
+          <HStack gap={3} vAlign="center"><img src="/mascot/working.png" alt="" style={{ height: 48, width: 'auto' }} />
+            <Explain>{`Concrete changes for the server, one per problem found.${after ? ` The hardened server scores ${after.overall ?? '–'}/100.` : ''}`}</Explain></HStack>
           <Table data={(report.fixes ?? []).map((f, i) => ({ ...f, i }))} idKey="i" verticalAlign="top" columns={[
             { key: 'where', header: 'Where' }, { key: 'fix', header: 'Fix' }]} />
         </VStack>
       ) : (
         <VStack gap={3}>
-          <Explain>Security rules added to the system prompt. Green lines are new.</Explain>
+          <HStack gap={3} vAlign="center"><img src={after && (after.overall ?? 0) >= 90 ? '/mascot/clear.png' : '/mascot/working.png'} alt="" style={{ height: 48, width: 'auto' }} />
+            <Explain>{`Security rules added to the system prompt. Green lines are new.${after ? ` After the re-scan: ${after.overall ?? '–'}/100.` : ''}`}</Explain></HStack>
           {report.patch ? <CodeBlock code={report.patch.diff} language="markdown" isDiff isWrapped width="100%" title="system_prompt.diff" maxHeight={520} />
             : <Text>No patch was generated for this scan.</Text>}
         </VStack>

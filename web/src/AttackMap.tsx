@@ -97,6 +97,7 @@ export function AttackMap({ map }: { map: SurfaceMap }) {
           {node && w ? (
             <VStack gap={3}>
               <VStack gap={1}>
+                {(node.status === 'leak' || node.status === 'partial') && <img src="/mascot/leak.png" alt="Alarmed spider: problem here" data-testid="map-mascot" style={{ height: 52, width: 'auto', alignSelf: 'flex-start' }} />}
                 <Text type="label" color="secondary">{KIND[node.type] ?? node.type}</Text>
                 <Heading level={3}>{node.label}</Heading>
                 <HStack gap={2}><Badge variant={w.variant} label={w.text} />{node.stats && <Text type="supporting">{node.stats}</Text>}</HStack>
