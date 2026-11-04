@@ -12,7 +12,7 @@ class LLMError(RuntimeError):
 
 
 class ChatClient:
-    def __init__(self, api_key: str, base_url: str, timeout: int = 120, max_retries: int = 5,
+    def __init__(self, api_key: str, base_url: str, timeout: int = 120, max_retries: int = 8,
                  extra_body: dict | None = None):
         self.extra_body = extra_body or {}
         if not api_key:
@@ -45,7 +45,7 @@ class ChatClient:
                 continue
             if r.status_code == 429 or r.status_code >= 500:
                 wait = float(r.headers.get("retry-after", delay) or delay)
-                time.sleep(min(wait, 30))
+                time.sleep(min(wait, 60))
                 delay *= 2
                 continue
             if r.status_code == 400 and "response_format" in payload:

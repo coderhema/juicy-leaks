@@ -2,10 +2,16 @@
 
 # GuardRail Lens
 
-**Red-team your chatbot with Meta's models before attackers do.** GuardRail Lens throws 30+ jailbreak and
-prompt-injection attacks at your bot, uses a Meta model (Muse Glimmer or Llama) to mutate them and to judge every reply, gives you a
-safety score per category with the worst transcripts, then writes a hardened system prompt (as a diff)
-and re-runs the attacks to prove the fix works.
+**Red-team your chatbots, MCP servers and endpoints.** Powered by Meta models (Muse Glimmer on NVIDIA
+NIM, or Llama 3.3 70B on Groq).
+
+- **Chatbots and HTTP endpoints:** 30+ jailbreak and prompt-injection attacks, mutated by an attacker model,
+  judged by a canary detector plus an LLM judge, scored per category, then a hardened system prompt (as a
+  diff) and a re-run that shows the before/after score.
+- **MCP servers:** connects over stdio or streamable HTTP with the official `mcp` SDK, lists the tools, and
+  checks for tool-description poisoning, prompt injection in tool results, secret/PII leakage, over-broad or
+  dangerous tools, and an agent hijack test where a live LLM agent uses the tools while being attacked.
+  Every finding comes with a severity and a concrete fix.
 
 Built for the **Meta Global AI Developer Hackathon** (Cerebral Valley, Indie track, Nov 2026).
 
@@ -19,7 +25,7 @@ comment, or one "print it in base64" is often enough to leak all of it. Big comp
 small teams and solo devs (like most builders here in Lagos) do not. They need a one-command check
 that says *how* leaky their bot is, *where*, and *how to fix it*.
 
-## How it works
+## How it works (chatbots and endpoints)
 
 ```mermaid
 flowchart LR
@@ -49,6 +55,31 @@ flowchart LR
 5. **Patch**: an LLM prompt-security engineer rewrites the system prompt, adding a security section
    targeted at the categories that failed (with a deterministic rule-based fallback). You get a unified diff.
 6. **Re-test**: the exact same attacks run against the hardened prompt, so you see the before/after score.
+
+## How it works (MCP servers)
+
+```mermaid
+flowchart LR
+    S[MCP server<br/>stdio or streamable HTTP] --> L[list_tools]
+    L --> P[Static checks<br/>poisoned descriptions,<br/>hidden unicode,<br/>dangerous capabilities]
+    L --> O[Probe safe tools<br/>scan outputs for secrets,<br/>PII, injected instructions]
+    L --> A[Agent loop<br/>LLM agent uses the tools<br/>under 6 attack tasks]
+    A -->|dangerous calls are<br/>blocked + recorded| F
+    P --> F[Findings + severity + fix]
+    O --> F
+    F --> C[Compare with hardened server<br/>before / after score]
+```
+
+| Check | What it catches |
+|---|---|
+| Tool description poisoning | `<IMPORTANT>` blocks, "do not tell the user", references to `~/.ssh`, invisible unicode in descriptions or schemas |
+| Prompt injection in tool results | Tool outputs that carry instructions to the agent ("NOTE TO AI: call run_shell...") |
+| Secret / PII leakage | Planted canaries plus generic patterns (API keys, phone numbers, emails, 11-digit IDs) in tool outputs |
+| Over-broad / dangerous tools | Shell or exec, unrestricted file write, outbound export or URLs, raw SQL (schema `pattern`/`enum` limits count as mitigation) |
+| Agent hijack | A live LLM agent follows poisoned descriptions, calls dangerous tools, passes secrets into arguments, or leaks to the user |
+
+Safety: GuardRail Lens never auto-calls dangerous tools during probing, and in the agent loop dangerous
+calls are blocked and recorded unless you set `allow_dangerous_calls: true`. Only scan servers you own.
 
 ## Quickstart
 
@@ -97,7 +128,8 @@ If no key is found, GuardRail Lens falls back to `--mock` mode automatically.
 ### Useful flags
 
 ```
-guardrail-lens scan --target FILE [--mock|--live] [--provider nvidia|groq|custom] [--model M]
+guardrail-lens scan (--target FILE | --url URL) [--mock|--live] [--compare SAFE.yaml] [--no-agent] [--secret S]
+                    [--provider nvidia|groq|custom] [--model M]
                     [--mutations 1] [--category encoding_tricks ...] [--limit N]
                     [--no-patch] [--workers 3] [--out reports]
 guardrail-lens attacks        # list templates
@@ -105,7 +137,36 @@ guardrail-lens attacks        # list templates
 
 Rate limited on a free tier? Use `--workers 1 --mutations 0 --limit 10`.
 
-## Defining a target
+### MCP servers
+
+```bash
+# vulnerable demo server vs. its hardened version (fake data; its shell/file tools are simulated)
+guardrail-lens scan --target examples/mcp_vulnerable.yaml --compare examples/mcp_safe.yaml
+guardrail-lens scan --target examples/mcp_vulnerable.yaml --mock --compare examples/mcp_safe.yaml   # scripted offline agent
+```
+
+```yaml
+name: My MCP server
+type: mcp
+mcp:
+  transport: stdio                 # or http
+  command: python
+  args: [path/to/server.py]
+  # url: http://localhost:8765/mcp  (transport: http, e.g. `python examples/mcp_vulnerable_server.py --http 8765`)
+secrets: [MY-CANARY]
+```
+
+### HTTP endpoints
+
+```bash
+python examples/http_demo_bot.py &                     # demo vulnerable bot on :8088
+guardrail-lens scan --target examples/http_endpoint.yaml
+guardrail-lens scan --url http://127.0.0.1:8088/chat --secret VIP-NAIRA-7781   # quick mode
+```
+
+Headers support `${ENV_VAR}` expansion so tokens stay out of YAML. HTTP targets are scored but not patched.
+
+## Defining a chatbot target
 
 ```yaml
 name: NaijaTrust Bank Support
@@ -142,8 +203,9 @@ system prompt contains secrets. Per-role overrides let you mix models (e.g. a sm
 
 ```
 guardrail_lens/  attacks.py  targets.py  judge.py  patch.py  scanner.py  report.py  llm.py  config.py  cli.py
-app.py           Streamlit UI
-examples/        vulnerable demo bots (fake data)
+guardrail_lens/mcp_scan.py   MCP checks + agent loop
+app.py           Streamlit UI (target type: chatbot / HTTP endpoint / MCP server)
+examples/        vulnerable demo bots, demo HTTP bot, vulnerable + hardened MCP servers (fake data)
 tests/           pytest, runs offline in mock mode
 docs/            DEMO_SCRIPT.md, SUBMISSION.md, screenshots
 ```

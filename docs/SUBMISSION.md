@@ -4,10 +4,10 @@
 
 **Project name:** GuardRail Lens
 
-**Tagline:** Red-team your chatbot with Llama: attack it, score it, patch it, prove the fix.
+**Tagline:** Red-team your chatbots, MCP servers and endpoints: attack, score, fix, prove it.
 
 **Track / theme:** Indie track. Push the Frontier (AI safety tooling), also Build for Your World
-(small teams and solo builders in Nigeria shipping bots with no security team).
+(small teams and solo builders in Nigeria shipping bots and agents with no security team).
 
 **Repository:** https://github.com/coderhema/guardrail-lens
 
@@ -22,7 +22,16 @@ into a stronger variant. Every reply is graded by a deterministic canary detecto
 base64, leetspeak, reversed and acrostic leaks) and a Llama judge. You get an overall safety score,
 per-category scores and the worst transcripts. A Llama "prompt-security engineer" then writes a hardened
 system prompt as a diff, and GuardRail Lens re-runs every attack to show the before and after score.
-It ships as a CLI and a Streamlit web app.
+It also works on any deployed chatbot behind an HTTP endpoint.
+
+For **MCP servers** it connects over stdio or streamable HTTP with the official MCP Python SDK, lists the
+tools, and checks for tool-description poisoning (hidden instructions or invisible unicode), prompt
+injection in tool results, secret and PII leakage through tool outputs, and over-broad or dangerous tools
+(shell, unrestricted file write, outbound export). Then a live LLM agent uses the tools while being
+attacked, and GuardRail Lens records whether it follows poisoned instructions, calls dangerous tools
+(blocked in a sandbox) or leaks data. Each finding has a severity and a concrete fix. A bundled
+vulnerable MCP server and its hardened version show the before and after.
+It ships as a CLI and a Streamlit web app with a target-type picker.
 
 ## Why it matters / inspiration
 Chatbots are going into banks, HR and customer support everywhere, and the system prompts often hold
@@ -30,13 +39,15 @@ discount codes, keys and customer data. Large companies have red teams; most sma
 I wanted a one-command check any developer can run before they ship.
 
 ## How Llama / Meta models are used
-Llama 3.3 70B (via NVIDIA NIM by default, Groq as an alternative) plays four roles:
-1. **Target**: runs the bot's system prompt so we attack the real model behaviour.
+A Meta model plays five roles. The default is Meta's **Muse Glimmer 30B** on NVIDIA NIM (NIM retired
+Llama 3.3 70B Instruct in August 2026); **Llama 3.3 70B** on Groq is built in as an alternative.
+1. **Target**: runs the bot's system prompt so we attack real model behaviour.
 2. **Attacker**: rewrites each attack template into a sneakier variant.
-3. **Judge**: grades replies as leak, partial or safe with a severity and a reason, in JSON mode.
+3. **Judge**: grades replies as leak, partial or safe with a severity and a reason, as JSON.
 4. **Patcher**: rewrites the system prompt with targeted defences.
-Because Llama is open-weights, the whole loop can run on infrastructure you control, which matters when the
-thing you are testing contains secrets.
+5. **Agent**: uses MCP tools in a live loop, so we can see whether poisoned tools hijack it.
+Any OpenAI-compatible Llama host works, including open-weights Llama on your own hardware, which matters
+when the thing you are testing contains secrets.
 
 ## How we built it
 Python package with an OpenAI-compatible client (swap providers with one env var), a YAML target format,
@@ -44,6 +55,10 @@ an attack library, a two-stage judge (canary detector, then Llama), a scorer, a 
 rule-based fallback, Markdown/JSON reports, a Streamlit UI, and pytest tests that run offline in mock mode.
 
 ## Challenges
+- The model I planned on (Llama 3.3 70B on NIM) had been retired, so the provider layer became
+  configurable (NIM, Groq, any OpenAI-compatible host) and handles reasoning models.
+- MCP agents can do real damage, so dangerous tools are never auto-called during probing, and in the
+  agent loop dangerous calls are blocked and recorded instead of executed.
 - LLM judges are inconsistent, so the canary detector runs first and gives deterministic proof of a leak,
   including obfuscated leaks (base64, leetspeak, reversed, acrostics). The LLM only judges what's left.
 - Free-tier rate limits: added retries with backoff, a worker setting, and skipping the judge call when a
@@ -54,7 +69,8 @@ rule-based fallback, Markdown/JSON reports, a Streamlit UI, and pytest tests tha
 
 ## Accomplishments
 - End-to-end loop (attack, judge, score, patch, re-test) in one command.
-- On the demo bank bot: [before score] -> [after score] with a live Llama 3.3 70B run.
+- Live results: see the "Live results" table in the README (filled from real NIM runs).
+- MCP: vulnerable demo server [X]/100 -> hardened server [Y]/100.
 - Works fully offline in mock mode, so anyone can try it in 30 seconds.
 
 ## What we learned
@@ -62,10 +78,11 @@ Most leaks come from a few patterns (asking for the prompt "for debugging", hidd
 content, and encoded output), and a short targeted security section fixes most of them.
 
 ## What's next
-- Multi-turn attacks (slowly escalating conversations) and tool-use / RAG injection tests.
+- Multi-turn attacks (slowly escalating conversations) and RAG injection tests.
+- MCP rug-pull detection (tool descriptions that change after approval) and resource/prompt scanning.
 - A GitHub Action that fails CI when a bot's safety score drops.
 - Llama Guard as an extra judge, and a public leaderboard of prompt-hardening patterns.
 - Larger community-contributed attack library.
 
 ## Built with
-Python, Llama 3.3 70B, NVIDIA NIM, Groq, Streamlit, pandas, pytest.
+Python, Meta Muse Glimmer, Llama 3.3 70B, NVIDIA NIM, Groq, MCP Python SDK, Streamlit, pandas, pytest.

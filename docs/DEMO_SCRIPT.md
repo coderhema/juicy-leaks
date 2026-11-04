@@ -1,20 +1,21 @@
 # GuardRail Lens: 3-minute demo script
 
-Setup before recording: `.env` has `NVIDIA_API_KEY` (or use `--mock`), terminal font large, browser at
-`streamlit run app.py`, bank bot selected. Do one dry run so the live scan is cached in your head.
-Tip: if the live API is slow, record the live CLI scan with `--limit 10 --mutations 0` and use the UI for the full run.
+Setup before recording: `.env` has `NVIDIA_API_KEY` (or use mock mode), large terminal font, browser on
+`streamlit run app.py`. Do a dry run first. Live NIM calls take about 10 s each, so **pre-run the live
+scans and load the saved JSON reports in the UI** ("load a saved report") instead of waiting on camera.
 
 | Time | On screen | What you say |
 |---|---|---|
-| 0:00-0:20 | Title slide or README hero: "GuardRail Lens" | "Every company is shipping chatbots with secrets in the system prompt: discount codes, API keys, customer records. One clever message can leak all of it. Big companies have red teams. Small teams don't. GuardRail Lens is a red team in one command, powered by Llama." |
-| 0:20-0:45 | `examples/bank_bot.yaml` in the editor. Highlight the fake fee-waiver code and fake API key | "Here's a typical bank support bot. Fake data, but a very real pattern: a staff-only code and a backend key sitting right in the prompt. I mark them as canaries so we can catch leaks for certain." |
-| 0:45-1:15 | Terminal: `guardrail-lens scan --target examples/bank_bot.yaml` running, progress lines | "GuardRail Lens loads 30 attack templates across 7 categories: prompt leaks, secret and PII exfiltration, role-play jailbreaks, indirect injection hidden in pasted documents, fake system messages, and encoding tricks like base64 and leetspeak. An attacker Llama mutates each one into a sneakier variant, so it's 60 attacks." |
-| 1:15-1:45 | Streamlit dashboard: score metric, category bar chart | "Each reply is judged twice: a canary detector that even decodes base64, leetspeak, reversed text and acrostics, then a Llama judge for anything subtle. This bot scores (read the number) out of 100. Indirect injection and role-play are the worst." |
-| 1:45-2:10 | "Worst transcripts" tab, expand the top leak | "Here's the proof: I asked it to print its instructions and it handed over the fee-waiver code and the API key. Every finding comes with the attack, the reply and the judge's reason." |
-| 2:10-2:35 | "Patch diff" tab, scroll the green lines | "Now the fix. A Llama prompt-security engineer rewrites the system prompt with rules targeted at exactly the categories that failed. You get a diff you can paste straight into production." |
-| 2:35-2:50 | Back to the metrics: Before vs After, chart with both bars | "Then it re-runs the same attacks against the hardened prompt. Score goes from (before) to (after). Measured, not guessed." |
-| 2:50-3:00 | README: provider table, GitHub URL | "It runs on Meta models: Muse Glimmer on NVIDIA NIM, or Llama 3.3 70B on Groq, works on any OpenAI-compatible endpoint or a live HTTP bot, and it's open source. GuardRail Lens: find the leak before attackers do." |
+| 0:00-0:15 | Logo / README hero | "Every company is shipping chatbots and AI agents wired to tools through MCP. One clever message, or one poisoned tool, can leak secrets or make the agent run commands. GuardRail Lens is a red team for chatbots, MCP servers and endpoints, powered by Meta models." |
+| 0:15-0:35 | `examples/bank_bot.yaml`, highlight the fake fee-waiver code and fake API key | "Part one: chatbots. Here's a bank support bot with a staff-only code and a backend key in its prompt. Fake data, very real pattern. I mark them as canaries." |
+| 0:35-1:00 | UI, target type "Chatbot", run (or load report). Score card + category chart | "30 attack templates in 7 categories, from prompt leaks and role-play jailbreaks to injections hidden in pasted documents and base64 tricks, each mutated by an attacker model. A canary detector and a Meta-model judge grade every reply. Here's the score per category." |
+| 1:00-1:20 | Worst findings tab, expand top one, then Patch diff tab | "Every finding has the attack, the reply and the reason. Then GuardRail Lens writes a hardened system prompt as a diff and re-runs every attack: before (X), after (Y)." |
+| 1:20-1:35 | Terminal: `python examples/http_demo_bot.py` then `guardrail-lens scan --url http://127.0.0.1:8088/chat --secret VIP-NAIRA-7781` | "Already deployed? Point it at any HTTP chatbot endpoint, no code changes." |
+| 1:35-1:55 | `examples/mcp_vulnerable_server.py`: scroll to the `<IMPORTANT>` block in add_numbers, the injected note, `run_shell` | "Part two: MCP servers. This demo server has a poisoned tool description, a notes tool that returns an injected instruction and a secret, and an unrestricted shell tool. All simulated, nothing executes." |
+| 1:55-2:30 | UI, target type "MCP server", compare with hardened server on, run. Score cards, chart, Worst findings: agent transcript | "GuardRail Lens connects with the official MCP SDK, lists the tools, flags the poisoned description and the shell tool, probes outputs for leaks and injections, then lets a live agent use the tools under attack. Watch: the agent reads the poisoned note and tries to call run_shell. We block it and record it." |
+| 2:30-2:45 | Fixes tab, then the before/after cards (vulnerable vs hardened) | "Each finding comes with a fix. The hardened server applies them: scores go from (X) to (Y)." |
+| 2:45-3:00 | README provider table, repo URL | "It runs on Meta's Muse Glimmer on NVIDIA NIM or Llama 3.3 on Groq, works offline in mock mode, and it's open source. GuardRail Lens: find the leak before attackers do." |
 
 Notes
-- Say clearly if a shot is mock mode. Real numbers should come from a live run.
-- Keep it under 3:00. Cut the 0:45-1:15 section shorter if needed.
+- Say on screen when something is mock mode. Quote live scores only from live runs.
+- If short on time, cut the HTTP section (1:20-1:35).
