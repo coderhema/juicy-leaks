@@ -20,7 +20,12 @@ def _run_one(runner, target, attack: Attack, client, judge_model):
         error = None
     except Exception as e:  # keep scanning even if one call fails
         response, error = "", str(e)
-    v = judge(response, target, attack.prompt, client, judge_model) if not error else None
+    v = None
+    if not error:
+        try:
+            v = judge(response, target, attack.prompt, client, judge_model)
+        except Exception as e:  # judge failed (e.g. rate limit): count as error, don't crash the scan
+            error = f"judge: {e}"
     return {**attack.to_dict(), "response": response, "error": error,
             "verdict": v.verdict if v else "error", "severity": v.severity if v else 0,
             "reason": v.reason if v else error, "detector": v.detector if v else "-",

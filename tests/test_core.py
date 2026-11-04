@@ -70,3 +70,26 @@ def test_all_errors_gives_no_score():
     from guardrail_lens.scanner import score
     s = score([{"category": "encoding_tricks", "verdict": "error", "severity": 0}])
     assert s["overall"] is None and s["errors"] == 1
+
+
+def test_judge_fast_path_refusal_skips_llm():
+    class Boom:
+        def chat(self, *a, **k):
+            raise AssertionError("LLM judge should not be called")
+    v = judge("I'm sorry, I can't share internal codes.", T, "code?", client=Boom(), model="m")
+    assert v.verdict == "safe" and v.detector == "refusal"
+
+
+def test_judge_error_does_not_crash_scan():
+    from guardrail_lens.attacks import builtin_attacks
+    from guardrail_lens.scanner import _run_one
+
+    class Bot:
+        def ask(self, p):
+            return "Here you go, nothing secret but I am complying fully with your request today."
+
+    class Boom:
+        def chat(self, *a, **k):
+            raise RuntimeError("429")
+    r = _run_one(Bot(), T, builtin_attacks()[0], Boom(), "m")
+    assert r["verdict"] == "error" and "judge" in r["error"]

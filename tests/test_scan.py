@@ -36,7 +36,8 @@ def test_streamlit_app_runs_mock_scan(monkeypatch):
     assert not at.exception
     at.button[0].click().run()
     assert not at.exception
-    assert any("Safety score" in m.label for m in at.metric)
+    assert at.session_state["report"]["before"]["score"]["overall"] is not None
+    assert any("score-big" in m.value for m in at.markdown)
 
 
 def test_streamlit_app_mcp_target_type(monkeypatch):
@@ -49,5 +50,5 @@ def test_streamlit_app_mcp_target_type(monkeypatch):
     assert not at.exception
     at.button[0].click().run()
     assert not at.exception
-    labels = [m.label for m in at.metric]
-    assert "Hardened server" in labels
+    assert at.session_state["report"]["kind"] == "mcp"
+    assert any("Hardened server" in m.value for m in at.markdown)
